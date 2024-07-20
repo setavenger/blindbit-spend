@@ -24,29 +24,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="send"
+        name="explore"
         options={{
-          title: 'send',
+          title: 'Explore',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'paper-plane' : 'paper-plane-outline'} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="receive"
-        options={{
-          title: 'Receive',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'qr-code' : 'qr-code-outline'} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'cog' : 'cog-outline'} color={color} />
+            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
           ),
         }}
       />
