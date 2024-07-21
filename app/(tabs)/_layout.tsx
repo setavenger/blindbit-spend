@@ -1,12 +1,20 @@
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 import React from 'react';
 
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useAppContext } from '@/context';
 
 export default function TabLayout() {
+  const {wallet} = useAppContext()
+
   const colorScheme = useColorScheme();
+
+  if (!wallet) {
+    console.log("wallet was null")
+    return <Redirect href="/restore" />;
+  }
 
   return (
     <Tabs

@@ -6,6 +6,8 @@
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
+    "preinstall": "npx npm-force-resolutions",
+    "postinstall": "rn-nodeify --install buffer,events,process,stream,inherits,path,assert,crypto --hack",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
@@ -18,8 +20,14 @@
     "@expo/vector-icons": "^14.0.2",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-navigation/native": "^6.0.2",
+    "assert": "^1.5.1",
+    "bip32": "^4.0.0",
+    "bip39": "^3.1.0",
+    "bitcoinjs-lib": "^6.1.6",
+    "buffer": "^4.9.2",
     "ecpair": "^2.1.0",
     "elliptic": "^6.5.6",
+    "events": "^1.1.1",
     "expo": "~51.0.21",
     "expo-constants": "~16.0.2",
     "expo-dev-client": "~4.0.20",
@@ -30,18 +38,28 @@
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.7",
     "expo-web-browser": "~13.0.3",
+    "path-browserify": "^0.0.0",
+    "process": "^0.11.10",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.3",
+    "react-native-crypto": "^2.2.0",
     "react-native-gesture-handler": "~2.16.1",
+    "react-native-randombytes": "^3.6.1",
     "react-native-reanimated": "~3.10.1",
     "react-native-safe-area-context": "4.10.5",
     "react-native-screens": "3.31.1",
     "react-native-secure-key-store": "^2.0.10",
-    "react-native-web": "~0.19.10"
+    "react-native-web": "~0.19.10",
+    "readable-stream": "^1.0.33",
+    "stream-browserify": "^1.0.0",
+    "tiny-secp256k1": "^2.2.3",
+    "undefined": "github:BlueWallet/SilentPayments"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@types/create-hash": "^1.2.6",
+    "@types/elliptic": "^6.4.18",
     "@types/jest": "^29.5.12",
     "@types/react": "~18.2.45",
     "@types/react-test-renderer": "^18.0.7",
@@ -53,7 +71,31 @@
     "jest-expo": "~51.0.3",
     "prettier": "^3.3.3",
     "react-test-renderer": "18.2.0",
+    "rn-nodeify": "^10.3.0",
     "typescript": "~5.3.3"
   },
-  "private": true
+  "private": true,
+  "react-native": {
+    "crypto": "react-native-crypto",
+    "path": "path-browserify",
+    "_stream_transform": "readable-stream/transform",
+    "_stream_readable": "readable-stream/readable",
+    "_stream_writable": "readable-stream/writable",
+    "_stream_duplex": "readable-stream/duplex",
+    "_stream_passthrough": "readable-stream/passthrough",
+    "stream": "stream-browserify"
+  },
+  "browser": {
+    "crypto": "react-native-crypto",
+    "path": "path-browserify",
+    "_stream_transform": "readable-stream/transform",
+    "_stream_readable": "readable-stream/readable",
+    "_stream_writable": "readable-stream/writable",
+    "_stream_duplex": "readable-stream/duplex",
+    "_stream_passthrough": "readable-stream/passthrough",
+    "stream": "stream-browserify"
+  },
+  "resolutions": {
+    "browserify-sign": "4.2.2"
+  }
 }

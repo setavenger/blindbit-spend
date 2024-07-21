@@ -1,20 +1,40 @@
-import { StyleSheet, SafeAreaView } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { Colors } from '@/constants/Colors';
 import { useEffect, useState } from 'react';
 import { MarginThemedView } from '@/components/MarginThemedView';
+import { useAppContext } from '@/context';
 
 export default function HomeScreen() {
-
+  const { blindbitApiService, wallet, updateWallet } = useAppContext()
   // define states
   const [syncHeight, setSyncHeight] = useState(853351);
 
   // load Data
   useEffect(() => {
-    
-  }, [])
+   blindbitApiService.fetchHeight()
+   .then(resp => {
+     setSyncHeight(resp.height)
+    })
+   .catch(error => {
+     console.error(error)
+     throw error
+    });
+
+   blindbitApiService.fetchUtxos()
+   .then(resp => {
+     if (!wallet) return
+     wallet.setUtxos(resp)
+     updateWallet(wallet)
+    })
+   .catch(error => {
+     console.error(error)
+     throw error
+    });
+
+  }, [wallet]);
+
 
   return (
       <MarginThemedView>
@@ -23,7 +43,7 @@ export default function HomeScreen() {
         </ThemedView>
         <ThemedView style={styles.body}>
           <ThemedText>Body Text </ThemedText>
-          <ThemedText>Body Text </ThemedText>
+          <ThemedText>{wallet && wallet.balance().toLocaleString()}</ThemedText>
           <ThemedText>Body Text </ThemedText>
           <ThemedText>Body Text </ThemedText>
           <ThemedText>Body Text </ThemedText>

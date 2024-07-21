@@ -1,32 +1,21 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, Platform } from 'react-native';
+import { StyleSheet } from 'react-native';
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { MarginThemedView } from '@/components/MarginThemedView';
 
 export default function SendScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={<Ionicons size={310} name="code-slash" style={styles.headerImage} />}>
+    <MarginThemedView>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Send</ThemedText>
+        <ThemedText type="title">Receive</ThemedText>
       </ThemedView>
-      <ThemedText>Here we will place the Send stuff</ThemedText>
-    </ParallaxScrollView>
+      <ThemedText>Will show your QR Code</ThemedText>
+    </MarginThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
   titleContainer: {
     flexDirection: 'row',
     gap: 8,

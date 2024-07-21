@@ -1,5 +1,7 @@
 import { HeightResponse, UtxosResponse } from "./models";
 
+let Buffer = require('buffer/').Buffer;
+
 export class BlindBitAPIService {
   private baseURL: string;
   private authHeader: string;

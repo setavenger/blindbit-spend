@@ -1,16 +1,13 @@
 import { Image, StyleSheet, Platform, SafeAreaView } from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { ScrollView } from 'react-native-gesture-handler';
 
 export default function HomeScreen() {
   return (
   <SafeAreaView>
     <ThemedView style={styles.titleContainer}>
-      <ThemedText type="title">Overview</ThemedText>
+      <ThemedText type="title">Settings</ThemedText>
     </ThemedView>
   </SafeAreaView>
   );

@@ -1,5 +1,6 @@
 import { BlindBitAPIService } from "@/api/blindbit";
-import React, { createContext, useContext } from "react";
+import { Wallet } from "@/wallet";
+import React, { createContext, useContext, useState } from "react";
 
 
 export function useAppContext(): AppContextType {
@@ -11,15 +12,24 @@ export function useAppContext(): AppContextType {
   return context
 }
 
+const blindbitApiService = new BlindBitAPIService("http://192.168.178.20:8888", "", "")
 type AppContextType = {
   blindbitApiService: BlindBitAPIService
+  wallet: Wallet | null
+  updateWallet: (wallet: Wallet | null) => void;
 }
  
 const AppContext = createContext<AppContextType | null>(null);
 
 export function AppContextProvider({ children }: { children: React.ReactNode }) {
+  const [wallet, setWallet] = useState<Wallet | null>(null);
+
+  const updateWallet = (newWallet: Wallet | null) => {
+    setWallet(newWallet);
+  };
+
   return (
-    <AppContext.Provider value={{}}>
+    <AppContext.Provider value={{ blindbitApiService, wallet, updateWallet }}>
       {children}
     </AppContext.Provider>
   )
