@@ -13,7 +13,6 @@ export default function Layout() {
 
   useEffect(()=> {
     // try to load wallet from storage
-    console.log("wallet:", wallet)
     // if the wallet is null go to setup 
     if (!wallet) {
       console.log("no wallet")

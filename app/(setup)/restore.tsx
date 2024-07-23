@@ -1,38 +1,28 @@
-import { Button, StyleSheet, TextInput } from 'react-native';
+import { Button, StyleSheet, Switch, TextInput, useColorScheme } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { MarginThemedView } from '@/components/MarginThemedView';
 import { Link } from 'expo-router';
 import { useState } from 'react';
-// import { walletFromMnemonic } from '@/wallet';
+import { walletFromMnemonic } from '@/wallet';
 import { useAppContext } from '@/context';
+import { Colors } from '@/constants/Colors';
 
 export default function RestoreScreen() {
   const {updateWallet} = useAppContext()
   const [mnemonic, setMnemonic] = useState('');
+  const [useTestnet, setUseTestnet] = useState(false);
+  const toggleSwitch = () => setUseTestnet(prev => !prev);
 
-  console.log("we are at restore")
 
   const setupWallet = () => {
-
-    // walletFromMnemonic(mnemonic).then(wallet => {updateWallet(wallet)})
-    // .catch(error => {
-    //  console.error(error)
-    //  throw error
-    // });
-    
-    walletFromMnemonic(mnemonic).then(()=> console.log("done"))
+    walletFromMnemonic(mnemonic, useTestnet).then(wallet => {updateWallet(wallet)})
     .catch(error => {
      console.error(error)
      throw error
     });
-
-
-    updateWallet(null);
   }
-
-  console.log("we are at restore")
 
   return (
     <MarginThemedView>
@@ -55,6 +45,16 @@ export default function RestoreScreen() {
         onPress={setupWallet}
         color={'red'}
       />
+      <ThemedView style={styles.toggleContainer}>
+        <Switch
+          style={{marginRight: 10}}
+          trackColor={{false: '#767577', true: `${Colors['light'].tint}`}}
+          thumbColor={useTestnet ? '#f5dd4b' : '#f4f3f4'}
+          onValueChange={toggleSwitch}
+          value={useTestnet}
+        />
+        <ThemedText>Testnet</ThemedText>
+      </ThemedView>
     </MarginThemedView>
   );
 }
@@ -70,37 +70,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
   },
+  toggleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  }
 });
-
-import { Wallet } from "@/wallet";
-import * as bip39 from 'bip39';
-import * as splib from '@/splib';
-//
-// export async function walletFromMnemonic(mnemonic: string ) {
-//   console.log(mnemonic);
-//   // console.log(mnemonic);
-//   const seed = await bip39.mnemonicToSeed(mnemonic);
-//   console.log(seed);
-//   const {scan, spend} = splib.deriveSilentPaymentKeyPair(seed);
-//
-//   // todo proper handling for labels insert them in scanning and create change label automatically
-//
-//   // return new Wallet(scan, spend, mnemonic, birthHeight, labels);
-//   return new Wallet(scan, spend, mnemonic);
-// }
-//
-
-export async function walletFromMnemonic(mnemonic: string ): Promise<null> {
-  console.log(mnemonic);
-  // console.log(mnemonic);
-  // const seed = await bip39.mnemonicToSeed(mnemonic);
-  // console.log(seed);
-  const {scan, spend} = splib.deriveSilentPaymentKeyPair(Buffer.from("ac34", "hex"));
-
-  // return new Wallet(scan, spend, mnemonic, birthHeight, labels);
-  // return new Wallet(scan, spend, mnemonic);
-  
-  return null
-}
-
 

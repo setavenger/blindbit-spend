@@ -13,21 +13,18 @@ export class Wallet {
   lastHeight: number;
   mainnet: boolean = false;
 
-  // method to trigger ui updates as it is used as a hook
-  onUpdate: (() => void) | null = null;
-
   constructor(
     scan: ec.KeyPair,
     spend: ec.KeyPair,
     mnemonic: string,
-    utxos = [],
+    utxos: Utxo[] = [],
     lastHeight = 0,
     mainnet: boolean = false,
   ) {
     this.mnemonic = mnemonic; // seed phrase in order to show it to the user in settings
     this.scanSecretKey = scan;
     this.spendSecretKey = spend;
-    this.address = encodeSilentPaymentAddress(scan, spend, mainnet ? 'sp' : 'tsp' , 0); // todo needs to be changed for production
+    this.address = encodeSilentPaymentAddress(scan, spend, mainnet ? 'sp' : 'tsp' , 0); 
     this.utxos = utxos;
     this.lastHeight = lastHeight;
   }
@@ -38,7 +35,6 @@ export class Wallet {
   public setUtxos(utxos: Utxo[]) {
     if (!utxos) return
     this.utxos = utxos
-    this.onUpdate && this.onUpdate();  // Notify about the change
   }
 
   /**
@@ -46,7 +42,6 @@ export class Wallet {
    */
   public setLastHeight(height: number) {
     this.lastHeight = height
-    this.onUpdate && this.onUpdate();  // Notify about the change
   }
 
   /**
@@ -55,13 +50,18 @@ export class Wallet {
    */
   public balance(states: utxoState[] = ['unspent']): number {
     const filteredUtxos = this.filterUtxos(states);
-    return filteredUtxos.reduce((accumulator, utxo) => accumulator + utxo.amount, 0);
+    const sum = filteredUtxos.reduce((accumulator, utxo) => accumulator + utxo.amount, 0);
+    return sum
   }
 
   filterUtxos(states: utxoState[]): Utxo[] {
     return this.utxos.filter(utxo => {
       if (states.indexOf(utxo.utxo_state) > -1) return utxo
     })
+  }
+
+  clone() {
+    return new Wallet(this.scanSecretKey, this.spendSecretKey, this.mnemonic, this.utxos, this.lastHeight, this.mainnet);
   }
 }
 

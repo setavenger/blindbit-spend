@@ -12,7 +12,6 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   if (!wallet) {
-    console.log("wallet was null")
     return <Redirect href="/restore" />;
   }
 

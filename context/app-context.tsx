@@ -25,7 +25,8 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
   const [wallet, setWallet] = useState<Wallet | null>(null);
 
   const updateWallet = (newWallet: Wallet | null) => {
-    setWallet(newWallet);
+    if (newWallet == null) return;
+    setWallet(newWallet.clone());
   };
 
   return (

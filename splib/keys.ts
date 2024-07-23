@@ -10,17 +10,25 @@ let Buffer = require('buffer/').Buffer;
 const bip32 = BIP32Factory(ecc);
 const secp256k1 = new elliptic.ec('secp256k1');
 
-export function deriveSilentPaymentKeyPair(seed: Buffer) {
+export function deriveSilentPaymentKeyPair(seed: Buffer, mainnet: boolean) {
   // Generate a random key pair from seed
-  const scan_key = "m/352'/0'/0'/1'/0";
-  const spend_key = "m/352'/0'/0'/0'/0";
+
+  let scanKey = "";
+  let spendKey = "";
+  if (mainnet) {
+    scanKey = "m/352'/0'/0'/1'/0";
+    spendKey = "m/352'/0'/0'/0'/0";
+  } else {
+    scanKey = "m/352'/1'/0'/1'/0";
+    spendKey = "m/352'/1'/0'/0'/0";
+  }
   const master = bip32.fromSeed(seed);
 
-  const scanSecretKey = master.derivePath(scan_key).privateKey;
+  const scanSecretKey = master.derivePath(scanKey).privateKey;
   if (!scanSecretKey) throw new Error('scan key derivation error')
   const keyPairScan = secp256k1.keyFromPrivate(scanSecretKey);
 
-  const spendSecretKey = master.derivePath(spend_key).privateKey;
+  const spendSecretKey = master.derivePath(spendKey).privateKey;
   if (!spendSecretKey) throw new Error('spend key derivation error')
   const keyPairSpend = secp256k1.keyFromPrivate(spendSecretKey);
 
