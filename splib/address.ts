@@ -2,6 +2,7 @@
 import {bech32m} from 'bech32';
 import { ec } from 'elliptic';
 import ecc from '../extra_modules/noble_ecc';
+import {taggedHash, ser32UintBE} from './utils'
 
 const bitcoin = require('bitcoinjs-lib');
 const {getBytes} = require('./utils');
@@ -10,7 +11,7 @@ let Buffer = require('buffer/').Buffer;
 bitcoin.initEccLib(ecc);
 const secp256k1 = new ec('secp256k1');
 
-
+export const G = Buffer.from("0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798", "hex");
 
 export function encodeSilentPaymentAddress(scan: ec.KeyPair, spend: ec.KeyPair, hrp = 'tsp', version = 0) {
   const words = bech32m.toWords(
@@ -49,7 +50,6 @@ function decode(hrp: string, addr: string): { version: number | null, data: numb
   return {version, data};
 }
 
-
 function getFromPublicECKey(data: Buffer) {
   if (data.length === 33) {
     return secp256k1.keyFromPublic(data);
@@ -72,5 +72,21 @@ function getFromPublicECKey(data: Buffer) {
   else {
     return null
   }
+}
+
+export function generateLabel(scan: ec.KeyPair, m: number) {
+  return taggedHash(
+    'BIP0352/Label',
+    Buffer.concat([
+      scan.getPrivate().toArrayLike(Buffer, 'be', 32),
+      ser32UintBE(m),
+    ]),
+  );
+}
+
+export function generateChangeLabel(scan: ec.KeyPair) {
+  const label = generateLabel(scan, 0);
+  const labelPubKey = ecc.pointMultiply(G, label);
+  return labelPubKey as Uint8Array;
 }
 

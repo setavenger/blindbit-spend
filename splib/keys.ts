@@ -37,4 +37,3 @@ export function deriveSilentPaymentKeyPair(seed: Buffer, mainnet: boolean) {
     spend: keyPairSpend,
   };
 }
-

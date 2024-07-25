@@ -2,13 +2,11 @@ import { BlindBitAPIService } from "@/api/blindbit";
 import { Wallet } from "@/wallet";
 import React, { createContext, useContext, useState } from "react";
 
-
 export function useAppContext(): AppContextType {
   const context = useContext(AppContext)
   if (!context) {
     throw new Error("component has to be within AppContext")
   }
-
   return context
 }
 

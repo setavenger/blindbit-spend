@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Switch, TextInput, useColorScheme } from 'react-native';
+import { Button, StyleSheet, Switch, TextInput } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -12,12 +12,12 @@ import { Colors } from '@/constants/Colors';
 export default function RestoreScreen() {
   const {updateWallet} = useAppContext()
   const [mnemonic, setMnemonic] = useState('');
-  const [useTestnet, setUseTestnet] = useState(false);
+  const [useTestnet, setUseTestnet] = useState(true); // is inverted
   const toggleSwitch = () => setUseTestnet(prev => !prev);
 
 
   const setupWallet = () => {
-    walletFromMnemonic(mnemonic, useTestnet).then(wallet => {updateWallet(wallet)})
+    walletFromMnemonic(mnemonic, !useTestnet).then(wallet => {updateWallet(wallet)})
     .catch(error => {
      console.error(error)
      throw error

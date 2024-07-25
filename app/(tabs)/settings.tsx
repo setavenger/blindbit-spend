@@ -2,21 +2,21 @@ import { Image, StyleSheet, Platform, SafeAreaView } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { MarginThemedView } from '@/components/MarginThemedView';
 
 export default function HomeScreen() {
   return (
-  <SafeAreaView>
-    <ThemedView style={styles.titleContainer}>
-      <ThemedText type="title">Settings</ThemedText>
-    </ThemedView>
-  </SafeAreaView>
+    <MarginThemedView>
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title">Settings</ThemedText>
+      </ThemedView>
+    </MarginThemedView>
   );
 }
 // #003153
 const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
     gap: 8,
   },
   stepContainer: {

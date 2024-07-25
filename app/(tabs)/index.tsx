@@ -9,8 +9,7 @@ import { useAppContext } from '@/context';
 
 export default function HomeScreen() {
   const { blindbitApiService, wallet, updateWallet } = useAppContext()
-  // define states
-  const [syncHeight, setSyncHeight] = useState(853351);
+  const [syncHeight, setSyncHeight] = useState(0);
 
   // load Data
   useEffect(() => {
