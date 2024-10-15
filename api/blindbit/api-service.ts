@@ -3,12 +3,16 @@ import { HeightResponse, UtxosResponse } from "./models";
 let Buffer = require('buffer/').Buffer;
 
 export class BlindBitAPIService {
-  private baseURL: string;
-  private authHeader: string;
-  private useTor: boolean;
+  baseURL: string;
+  username: string; // if changed also change header
+  password: string; // if changed also change header
+  authHeader: string;
+  useTor: boolean;
 
   constructor(baseURL: string, username: string, password: string, useTor: boolean = false) {
-    this.baseURL = baseURL;
+    this.baseURL = baseURL.replace(/\/$/,""); // todo might want to use slice instead
+    this.username = username;
+    this.password = password;
     this.authHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
     this.useTor = useTor;
     // Initialize Tor connectivity if required

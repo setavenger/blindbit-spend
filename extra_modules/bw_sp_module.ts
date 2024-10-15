@@ -50,7 +50,8 @@ export class SilentPayment {
     const silentPaymentGroups: Array<SilentPaymentGroup> = [];
     for (let i = 0; i < targets.length; i++) {
       const target = targets[i];
-      if (!target.address?.startsWith("sp1") && !target.address?.startsWith("tsp1")) {
+      // todo double check
+      if (!target.address?.startsWith("sp1") || (network !== bitcoin.networks.bitcoin && !target.address?.startsWith("tsp1"))) {
         ret[i] = target; // passthrough
         continue;
       }

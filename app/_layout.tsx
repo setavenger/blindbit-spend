@@ -1,4 +1,6 @@
+// should be at the top
 import '../shim.js'
+
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
@@ -40,7 +42,7 @@ function InnerLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack initialRouteName={'/restore'}>
+      <Stack initialRouteName={'/tabs'}>
         <Stack.Screen name="(setup)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />

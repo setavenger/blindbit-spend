@@ -1,18 +1,33 @@
+import { ViewProps } from 'react-native';
 import { Redirect, Tabs } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useAppContext } from '@/context';
+import { MarginThemedView } from '@/components/MarginThemedView';
+import { ThemedText } from '@/components/ThemedText';
 
 export default function TabLayout() {
-  const {wallet} = useAppContext()
+  const {wallet, appState} = useAppContext()
 
   const colorScheme = useColorScheme();
 
   if (!wallet) {
-    return <Redirect href="/restore" />;
+    switch (appState) {
+      case "Loading":
+        // basically another splash screen.
+        return <WaitingScreen waitText={'Loading Wallet...'} />
+      case 'Loaded':
+        if (!wallet) {
+          throw new Error("There should have been a wallet but none was found")
+        }
+        break
+      case 'New':
+      default:
+        return <Redirect href="/restore" />;
+    }
   }
 
   return (
@@ -59,4 +74,17 @@ export default function TabLayout() {
       />
     </Tabs>
   );
+}
+
+export type WaitingScreenProps = ViewProps & {
+  waitText: string;
+};
+
+
+function WaitingScreen({waitText, style, ...otherProps}: WaitingScreenProps) {
+  return (
+    <MarginThemedView style={[{flex: 1, alignItems: 'center'}, style]} {...otherProps}>
+      <ThemedText type='title'>{waitText}</ThemedText>
+    </MarginThemedView>
+  )
 }

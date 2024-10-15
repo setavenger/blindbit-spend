@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { Button, StyleSheet, TouchableOpacity } from 'react-native';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { ThemedText } from '@/components/ThemedText';
@@ -6,6 +6,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { useEffect, useState } from 'react';
 import { MarginThemedView } from '@/components/MarginThemedView';
 import { useAppContext } from '@/context';
+import { router } from 'expo-router';
 
 export default function HomeScreen() {
   const { blindbitApiService, wallet, updateWallet } = useAppContext()
@@ -17,6 +18,12 @@ export default function HomeScreen() {
   }, [syncHeight]);
 
   const refreshWallet = () => {
+    if (blindbitApiService == null) {
+      // console.warn("blindbitApiService is null");
+      return;
+    };
+
+    console.log(blindbitApiService);
     blindbitApiService.fetchHeight()
     .then(resp => {
       setSyncHeight(resp.height);
@@ -38,7 +45,13 @@ export default function HomeScreen() {
     });
   }
 
-  if (!wallet) return (<MarginThemedView><ThemedText type='title'>Wallet not setup</ThemedText> </MarginThemedView>)
+  if (!wallet) {
+    return (
+      <MarginThemedView>
+        <ThemedText type='title'>Wallet not setup</ThemedText>
+      </MarginThemedView>
+    )
+  };
 
   return (
       <MarginThemedView>
@@ -50,12 +63,23 @@ export default function HomeScreen() {
             <Ionicons size={28} name={'refresh'}/>
           </TouchableOpacity>
         </ThemedView>
-        {!wallet.mainnet && <ThemedView style={styles.testnetWarning}><ThemedText style={styles.testnetWarning}>TESTNET</ThemedText></ThemedView>}
+        {!wallet.mainnet && <ThemedView style={styles.testnetWarning}><ThemedText style={styles.testnetWarning}>{wallet.networkType}</ThemedText></ThemedView>}
         <ThemedView style={styles.body}>
           <ThemedText type='title'>{wallet && wallet.balance().toLocaleString()} Sats</ThemedText>
+          {blindbitApiService == null ? <NoBlindBitBackendConfigured/> : null}
         </ThemedView>
       </MarginThemedView>
   );
+}
+
+
+function NoBlindBitBackendConfigured() {
+  return (
+    <ThemedView style={{alignItems: 'center'}}>
+      <ThemedText type='defaultSemiBold' style={{color: 'red'}}>No backend configured</ThemedText>
+      <ThemedText type='link' onPress={() => router.push('/settings')}>Settings</ThemedText>
+    </ThemedView>
+  )
 }
 
 const styles = StyleSheet.create({

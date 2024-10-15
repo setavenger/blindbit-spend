@@ -7,7 +7,7 @@ import { SilentPayment } from '../extra_modules/bw_sp_module'
 import { InputUTXO, Output, Recipient } from "./send";
 import * as bitcoin from '../extra_modules/bitcoinjs-lib/src';
 // import * as bitcoin from 'bitcoinjs-lib';
-import coinselect from 'coinselect'
+import coinselect from 'coinselect'; // look at bluewallet, they have typed coinselect in a custom module
 import ecc from '../extra_modules/noble_ecc';
 import { ECPairFactory } from "ecpair";
 import { getBytes } from "@/splib/utils";
@@ -18,13 +18,17 @@ bitcoin.initEccLib(ecc);
 
 let Buffer = require('buffer/').Buffer;
 
+export type network = 'mainnet' | 'signet' | 'testnet' | 'regtest';
+
 export class Wallet {
   // move types to ECPair seems more straightforward
-  private spendSecretKey: ec.KeyPair;
-  private scanSecretKey: ec.KeyPair;
-  private mnemonic: string; // seed phrase in order to show it to the user in settings
+  spendSecretKey: ec.KeyPair;
+  scanSecretKey: ec.KeyPair;
+  mnemonic: string; // seed phrase in order to show it to the user in settings
 
   mainnet: boolean;
+  networkType: network;
+  network: bitcoin.Network
   utxos: Utxo[];
   address: string;
   changeAddress: string;
@@ -34,18 +38,33 @@ export class Wallet {
     scan: ec.KeyPair,
     spend: ec.KeyPair,
     mnemonic: string,
-    mainnet: boolean,
+    networkType: network,
     utxos: Utxo[] = [],
     lastHeight = 0,
   ) {
     this.mnemonic = mnemonic;
     this.scanSecretKey = scan;
     this.spendSecretKey = spend;
-    this.mainnet = mainnet;
+    this.networkType = networkType;
     this.utxos = utxos;
     this.lastHeight = lastHeight;
 
     // the parts that need to be computed
+    this.mainnet = networkType === 'mainnet';
+    switch (networkType) {
+      case "mainnet":
+        this.network = bitcoin.networks.bitcoin
+        break
+      case "testnet":
+        this.network = bitcoin.networks.testnet
+        break
+      case "signet":
+      case "regtest":
+        // signet and regtest have the same signatures in bitcoinjs-lib 
+        this.network = bitcoin.networks.regtest
+        break
+    }
+
     // this.address = encodeSilentPaymentAddress(scan, spend, this.mainnet ? 'sp' : 'sp' , 0); // change back to tsp
     this.address = encodeSilentPaymentAddress(scan, spend, this.mainnet ? 'sp' : 'tsp' , 0);
     const changePubKeyBytes = generateChangeLabel(scan);
@@ -53,7 +72,6 @@ export class Wallet {
     const combinedLabelKey = ecc.pointAdd(getBytes(changePubKey), getBytes(this.spendSecretKey)) as Buffer
     const labelKey = secp256k1.keyFromPublic(combinedLabelKey)
     this.changeAddress = encodeSilentPaymentAddress(scan, labelKey, this.mainnet ? 'sp' : 'tsp' , 0); // change back to tsp
-    console.log("change:", this.changeAddress);
   }
 
   /**
@@ -131,9 +149,6 @@ export class Wallet {
 
     if (!inputs || !outputs) throw new Error("no possible solution");   
 
-    console.log("inputs:", inputs);
-    console.log("outputs:", outputs);
-
     // attach change address to output without address
     outputs.forEach((out: Output) => {
       if (!out.address) {
@@ -144,12 +159,10 @@ export class Wallet {
     // route through silent payment 
     const sp = new SilentPayment();
     // const targets = sp.createTransaction(inputs, outputs, bitcoin.networks.testnet);
-    const targets = sp.createTransaction(inputs, outputs,bitcoin.networks.regtest);
-
-    console.log("targets:", targets);
+    const targets = sp.createTransaction(inputs, outputs, this.network);
     // create psbt | might need to specify network
     //make this dependant on wallet mainnet flag
-    const psbt = new bitcoin.Psbt({network: bitcoin.networks.regtest});
+    const psbt = new bitcoin.Psbt({network: this.network});
 
     inputs.forEach((input) => {
       const rawKey = ECPair.fromWIF(input.wif).publicKey
@@ -166,7 +179,6 @@ export class Wallet {
       if (!out.address) throw new Error("an address was missing");
       if (!out.value) throw new Error("a value was missing");
       
-      console.log("new address:", out.address)
       psbt.addOutput({
         address: out.address,
         value: out.value,
@@ -188,13 +200,8 @@ export class Wallet {
     return txHex;
   }
 
-  // static pubkeyToAddress(hex: string): string {
-  //   const publicKey = Buffer.from("5120" + hex, "hex");
-  //   return bitcoin.address.fromOutputScript(publicKey, bitcoin.networks.testnet);
-  // }
-
   clone() {
-    return new Wallet(this.scanSecretKey, this.spendSecretKey, this.mnemonic, this.mainnet, this.utxos, this.lastHeight);
+    return new Wallet(this.scanSecretKey, this.spendSecretKey, this.mnemonic, this.networkType, this.utxos, this.lastHeight);
   }
 }
 
