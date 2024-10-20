@@ -48,7 +48,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="(send)"
         options={{
-          title: 'send',
+          title: 'Send',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'paper-plane' : 'paper-plane-outline'} color={color} />
           ),

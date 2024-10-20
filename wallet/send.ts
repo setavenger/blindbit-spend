@@ -1,4 +1,5 @@
-import { UTXOType } from "silent-payments"
+import { UTXOType } from "silent-payments";
+import { UTXO } from "bitcoinselect";
 
 let Buffer = require('buffer/').Buffer;
 
@@ -24,6 +25,3 @@ export interface Output {
   value: number
 }
 
-function prepareTransaction() {
-  
-}

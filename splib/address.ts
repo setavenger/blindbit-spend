@@ -22,6 +22,9 @@ export function encodeSilentPaymentAddress(scan: ec.KeyPair, spend: ec.KeyPair, 
 
 export function decodeSilentPaymentAddress(address: string, hrp: string = 'tsp') {
   const {version, data} = decode(hrp, address);
+  if (version !== 0) {
+    throw new Error("Unexpected version of silent payment address");
+  }
   const dataBuf = Buffer.from(data);
 
   const ScanPubKey = getFromPublicECKey(dataBuf.subarray(0, 33));
@@ -43,7 +46,7 @@ function decode(hrp: string, addr: string): { version: number | null, data: numb
   }
 
   const version = decoded.words[0];
-  if (version > 16) {
+  if (version > 31) {// 31 recommended in BIP 352
     return {version: null, data: null};
   }
 

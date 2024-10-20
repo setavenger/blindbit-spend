@@ -7,7 +7,8 @@ import { SilentPayment } from '../extra_modules/bw_sp_module'
 import { InputUTXO, Output, Recipient } from "./send";
 import * as bitcoin from '../extra_modules/bitcoinjs-lib/src';
 // import * as bitcoin from 'bitcoinjs-lib';
-import coinselect from 'coinselect'; // look at bluewallet, they have typed coinselect in a custom module
+// import coinselect from 'coinselect'; // look at bluewallet, they have typed coinselect in a custom module
+import coinselect from 'bitcoinselect'; // look at bluewallet, they have typed coinselect in a custom module
 import ecc from '../extra_modules/noble_ecc';
 import { ECPairFactory } from "ecpair";
 import { getBytes } from "@/splib/utils";
@@ -69,7 +70,8 @@ export class Wallet {
     this.address = encodeSilentPaymentAddress(scan, spend, this.mainnet ? 'sp' : 'tsp' , 0);
     const changePubKeyBytes = generateChangeLabel(scan);
     const changePubKey = secp256k1.keyFromPublic(changePubKeyBytes);
-    const combinedLabelKey = ecc.pointAdd(getBytes(changePubKey), getBytes(this.spendSecretKey)) as Buffer
+    // important to add the parity to the public keys otherwise the sum could have the wrong parity
+    const combinedLabelKey = ecc.pointAdd(getBytes(changePubKey, false), getBytes(this.spendSecretKey, false)) as Buffer
     const labelKey = secp256k1.keyFromPublic(combinedLabelKey)
     this.changeAddress = encodeSilentPaymentAddress(scan, labelKey, this.mainnet ? 'sp' : 'tsp' , 0); // change back to tsp
   }
@@ -106,7 +108,7 @@ export class Wallet {
   }
  
   // returns transaction hex || maybe we should return PSBT instead??
-  public async makeTransaction(recipients: Recipient[], feeRate: number, states: utxoState[] = ['unspent']): Promise<string> {
+  public makeTransaction(recipients: Recipient[], feeRate: number, states: utxoState[] = ['unspent']): bitcoin.Psbt {
     let utxos: InputUTXO[] = [];
 
     const spendKeyBuf = this.spendSecretKey.getPrivate().toArrayLike(Buffer, 'be', 32);
@@ -141,6 +143,9 @@ export class Wallet {
       outputs: Output[];
       fee: number;
     }
+    // currently sending to sp addresses results in slightly too low fees.
+    // one would have to temporarily replace the address with a bc1p... address 
+    // so coinselect recognises that as a p2tr address which is larger than p2wpkh
     let result: CoinSelectResult = coinselect(utxos, targetsRaw, feeRate);
     let { inputs, outputs, fee } = result;
 
@@ -152,14 +157,17 @@ export class Wallet {
     // attach change address to output without address
     outputs.forEach((out: Output) => {
       if (!out.address) {
+        console.log("change address:", this.changeAddress)
         out.address = this.changeAddress;
       };
     });
 
     // route through silent payment 
     const sp = new SilentPayment();
+
     // const targets = sp.createTransaction(inputs, outputs, bitcoin.networks.testnet);
-    const targets = sp.createTransaction(inputs, outputs, this.network);
+    const targets = sp.createTransaction(inputs, outputs, this.network === bitcoin.networks.bitcoin, this.network);
+
     // create psbt | might need to specify network
     //make this dependant on wallet mainnet flag
     const psbt = new bitcoin.Psbt({network: this.network});
@@ -185,7 +193,6 @@ export class Wallet {
       });
     });
 
-
     // sign inputs
     for (let i = 0; i < inputs.length; i++) {
       let key = ECPair.fromWIF(inputs[i].wif);
@@ -197,7 +204,7 @@ export class Wallet {
     const txHex = psbt.extractTransaction(true).toHex();
     console.log('Transaction Hex:', txHex);
 
-    return txHex;
+    return psbt;
   }
 
   clone() {

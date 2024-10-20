@@ -44,14 +44,18 @@ export class SilentPayment {
    * If target initially already had onchain address its skipped.
    * Numeric values (if present) for targets are passed through.
    */
-  createTransaction(utxos: UTXO[], targets: Target[], network: bitcoin.networks.Network = bitcoin.networks.bitcoin): Target[] {
+  createTransaction(utxos: UTXO[], targets: Target[], mainnet: boolean, network: bitcoin.networks.Network): Target[] {
     const ret: Target[] = new Array(targets.length);
 
     const silentPaymentGroups: Array<SilentPaymentGroup> = [];
     for (let i = 0; i < targets.length; i++) {
       const target = targets[i];
       // todo double check
-      if (!target.address?.startsWith("sp1") || (network !== bitcoin.networks.bitcoin && !target.address?.startsWith("tsp1"))) {
+
+      if (
+        (!target.address?.startsWith("sp1") && mainnet) || // On mainnet, non-sp1
+        (!target.address?.startsWith("tsp1") && !mainnet)    // On testnets, non-tsp1
+      ) {
         ret[i] = target; // passthrough
         continue;
       }

@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Platform, SafeAreaView, TextInput, Switch, Button, View } from 'react-native';
+import { StyleSheet, Switch, Button, View } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -7,8 +7,10 @@ import { useState } from 'react';
 import { useAppContext } from '@/context';
 import { Spacer } from '@/components/Spacer';
 import { Colors } from '@/constants/Colors';
+import { router } from 'expo-router';
+import { ThemedTextInput } from '@/components/ThemedTextInput';
 
-export default function HomeScreen() {
+export default function SettingsScreen() {
   return (
     <MarginThemedView>
       <ThemedView style={styles.titleContainer}>
@@ -35,8 +37,10 @@ function BlindBitBackendSettings() {
 
   const confirmChanges = () => {
     try {
-      updateBlindbitApiSettings({baseUrl, user, pass, tor})
+      updateBlindbitApiSettings({baseUrl, user, pass, tor});
+      router.replace("/")
     } catch (error) {
+      console.error(error)
       throw error
     }
   }
@@ -44,7 +48,7 @@ function BlindBitBackendSettings() {
   return (
     <ThemedView>
       <ThemedText>Set base url</ThemedText>
-      <TextInput
+      <ThemedTextInput
         style={styles.input}
         onChangeText={setBaseUrl}
         value={baseUrl}
@@ -54,7 +58,7 @@ function BlindBitBackendSettings() {
       />
       <Spacer />
       <ThemedText>Set username for basic auth</ThemedText>
-      <TextInput
+      <ThemedTextInput
         style={styles.input}
         onChangeText={setUser}
         value={user}
@@ -64,7 +68,7 @@ function BlindBitBackendSettings() {
       />
       <Spacer />
       <ThemedText>Set password for basic auth</ThemedText>
-      <TextInput
+      <ThemedTextInput
         style={styles.input}
         onChangeText={setPass}
         value={pass}

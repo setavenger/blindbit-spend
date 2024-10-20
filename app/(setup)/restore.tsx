@@ -10,6 +10,7 @@ import { useAppContext } from '@/context';
 import { Colors } from '@/constants/Colors';
 import RNPickerSelect from 'react-native-picker-select';
 import { Spacer } from '@/components/Spacer';
+import { ThemedTextInput } from '@/components/ThemedTextInput';
 
 export default function RestoreScreen() {
   const { wallet, updateWallet } = useAppContext()
@@ -67,7 +68,7 @@ export default function RestoreScreen() {
       </ThemedView>
       <Spacer />
       <ThemedText>Here you can input your seed</ThemedText>
-      <TextInput
+      <ThemedTextInput
         style={styles.input}
         onChangeText={setMnemonic}
         value={mnemonic}

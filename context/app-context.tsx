@@ -1,7 +1,7 @@
 import { BlindBitAPIService } from "@/api/blindbit";
 import { Wallet } from "@/wallet";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { BlindBitApiSettings, deleteWalletFromDisk, loadBlindBitApiSettings, loadWalletFromDisk, saveWalletToDisk } from "./storage";
+import { BlindBitApiSettings, deleteWalletFromDisk, loadBlindBitApiSettings, loadWalletFromDisk, saveBlindBitApiSettings, saveWalletToDisk } from "./storage";
 
 export function useAppContext(): AppContextType {
   const context = useContext(AppContext)
@@ -96,6 +96,12 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
       throw error
     }
   }, []);
+
+
+  useEffect(() => {
+    if (!blindbitApiSettings) return;
+    saveBlindBitApiSettings(blindbitApiSettings);
+  }, [blindbitApiSettings]);
 
   return (
     <AppContext.Provider 

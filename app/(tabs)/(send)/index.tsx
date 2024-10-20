@@ -7,10 +7,13 @@ import { useState } from 'react';
 import { MarginThemedView } from '@/components/MarginThemedView';
 import { Spacer } from '@/components/Spacer';
 import { Colors } from '@/constants/Colors';
-import { useAppContext } from '@/context';
+import { useAppContext, useSendContext } from '@/context';
+import { ThemedTextInput } from '@/components/ThemedTextInput';
+import { router } from 'expo-router';
 
 export default function SendScreen() {
-  const { wallet } = useAppContext()
+  const { wallet } = useAppContext();
+  const { updatePsbt } = useSendContext();
   const [address, setAddress] = useState('');
   const [amount, setAmount] = useState(0);
   const [displayAmount, setDisplayAmount] = useState(''); // for storing the formatted display value
@@ -37,8 +40,11 @@ export default function SendScreen() {
   const createTx = () => {
     if (!wallet) {Alert.alert("no wallet is set up"); return};
     try {
-      wallet.makeTransaction([{address, value: amount}], fee)
+      const newPsbt = wallet.makeTransaction([{address, value: amount}], fee);
+      updatePsbt(newPsbt);
+      router.navigate("/confirm")
     } catch (error) {
+     console.error(error)
      throw error 
     }
   }
@@ -51,38 +57,32 @@ export default function SendScreen() {
       <Spacer magnitude={40}/>
       <ThemedView>
         <ThemedText type={'subtitle'}>Recipient Address</ThemedText>
-        <ThemedView style={[styles.inputField]}>
-          <TextInput
-            autoCorrect={false}
-            autoCapitalize={'none'}
-            style={{
-              flex: 1,
-              height: 40,
-              color: '#000000',
-            }}
-            onChangeText={setAddress}
-            placeholder="bc1p..."
-            value={address}
-          />
-        </ThemedView>
+        <ThemedTextInput
+          autoCorrect={false}
+          autoCapitalize={'none'}
+          style={styles.input}
+          onChangeText={setAddress}
+          placeholder="bc1p..."
+          value={address}
+        />
       </ThemedView>
       <Spacer  magnitude={40}/>
       <ThemedView>
         <ThemedText type={'subtitle'}>Amount (sats)</ThemedText>
-        <ThemedView style={[styles.inputField]}>
+        <ThemedView style={[]}>
           <NumericFormat
             value={displayAmount}
             displayType={'text'}
             thousandSeparator={true}
             renderText={value => (
-              <TextInput
+              <ThemedTextInput
                 autoCorrect={false}
                 autoCapitalize={'none'}
                 onChangeText={handleAmountChange}
                 value={value}
                 placeholder="Amount in Sats"
                 keyboardType="numeric"
-                style={{height: 40}}
+                style={styles.input}
               />
             )}
           />
@@ -91,20 +91,20 @@ export default function SendScreen() {
       <Spacer magnitude={40} />
       <ThemedView>
         <ThemedText type={'subtitle'}>Fee (sat/vByte)</ThemedText>
-        <ThemedView style={[styles.inputField]}>
+        <ThemedView>
           <NumericFormat
             value={displayFee}
             displayType={'text'}
             thousandSeparator={true}
             renderText={value => (
-              <TextInput
+              <ThemedTextInput
                 autoCorrect={false}
                 autoCapitalize={'none'}
                 onChangeText={handleFeeChange}
                 value={value}
                 placeholder="sats/vByte"
                 keyboardType="numeric"
-                style={{height: 40}}
+                style={styles.input}
               />
             )}
           />
@@ -125,11 +125,12 @@ export default function SendScreen() {
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  input: {
+    height: 40,
+    marginTop: 6,
+    // margin: 12,
+    borderWidth: 1,
+    padding: 10,
   },
   titleContainer: {
     flexDirection: 'row',
@@ -143,5 +144,5 @@ const styles = StyleSheet.create({
     padding: 10,
     justifyContent: 'center',
   },
-
 });
+

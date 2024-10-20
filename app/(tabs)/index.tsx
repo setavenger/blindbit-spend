@@ -7,15 +7,11 @@ import { useEffect, useState } from 'react';
 import { MarginThemedView } from '@/components/MarginThemedView';
 import { useAppContext } from '@/context';
 import { router } from 'expo-router';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 export default function HomeScreen() {
   const { blindbitApiService, wallet, updateWallet } = useAppContext()
   const [syncHeight, setSyncHeight] = useState(0);
-
-  // load Data
-  useEffect(() => {
-    refreshWallet()
-  }, [syncHeight]);
 
   const refreshWallet = () => {
     if (blindbitApiService == null) {
@@ -23,7 +19,6 @@ export default function HomeScreen() {
       return;
     };
 
-    console.log(blindbitApiService);
     blindbitApiService.fetchHeight()
     .then(resp => {
       setSyncHeight(resp.height);
@@ -45,6 +40,12 @@ export default function HomeScreen() {
     });
   }
 
+  // load Data
+  useEffect(() => {
+    refreshWallet()
+  }, []);
+
+
   if (!wallet) {
     return (
       <MarginThemedView>
@@ -60,7 +61,11 @@ export default function HomeScreen() {
           <TouchableOpacity
             onPress={()=> {refreshWallet()}}
           >
-            <Ionicons size={28} name={'refresh'}/>
+            <Ionicons 
+              size={28} 
+              name={'refresh'}
+              color={useThemeColor({light: "", dark: ""}, "text")}
+            />
           </TouchableOpacity>
         </ThemedView>
         {!wallet.mainnet && <ThemedView style={styles.testnetWarning}><ThemedText style={styles.testnetWarning}>{wallet.networkType}</ThemedText></ThemedView>}

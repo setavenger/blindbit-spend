@@ -1,5 +1,5 @@
-import { Text, type TextProps, StyleSheet } from 'react-native';
-
+import { Text, type TextProps, StyleSheet, TouchableOpacity } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
 export type ThemedTextProps = TextProps & {
@@ -31,6 +31,23 @@ export function ThemedText({
       {...rest}
     />
   );
+}
+
+export interface ThemedTextCopiableProps extends ThemedTextProps {
+  text?: string;
+}
+
+export function ThemedTextCopiable({text, ...rest}: ThemedTextCopiableProps) {
+  const onPressAddress = () => {
+    if (!text) return;
+    Clipboard.setString(text);
+  };
+
+  return (
+    <TouchableOpacity onPress={onPressAddress}>
+      <ThemedText {...rest}>{text}</ThemedText>
+    </TouchableOpacity>
+  )
 }
 
 const styles = StyleSheet.create({
