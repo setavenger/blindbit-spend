@@ -1,4 +1,4 @@
-import { SafeAreaView, ViewProps, StyleSheet } from 'react-native';
+import { SafeAreaView, ViewProps, StyleSheet, ScrollView } from 'react-native';
 
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { ThemedView } from './ThemedView';
@@ -16,6 +16,20 @@ export function MarginThemedView({ style, lightColor, darkColor, children, ...ot
       <ThemedView style={[styles.root, { backgroundColor }, style]} {...otherProps}>
         {children}
       </ThemedView>
+    </SafeAreaView>
+  )
+};
+
+export function MarginThemedScrollView({ style, lightColor, darkColor, children, ...otherProps }: ThemedViewProps) {
+  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
+
+  return (
+    <SafeAreaView style={[{ flex: 1 }, { backgroundColor }]}>
+      <ScrollView>
+        <ThemedView style={[styles.root, { backgroundColor }, style]} {...otherProps}>
+          {children}
+        </ThemedView>
+      </ScrollView>
     </SafeAreaView>
   )
 };

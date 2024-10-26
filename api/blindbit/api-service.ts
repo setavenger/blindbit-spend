@@ -1,6 +1,9 @@
 import { HeightResponse, UtxosResponse } from "./models";
+import Tor from "react-native-tor";
 
 let Buffer = require('buffer/').Buffer;
+
+const tor = Tor()
 
 export class BlindBitAPIService {
   baseURL: string;
@@ -15,51 +18,43 @@ export class BlindBitAPIService {
     this.password = password;
     this.authHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
     this.useTor = useTor;
+
     // Initialize Tor connectivity if required
     if (this.useTor) {
-      this.setupTorConnection();
+      // this.setupTorConnection();
     }
   }
 
-  private setupTorConnection() {
+  private async setupTorConnection() {
+    console.log('Setting up tor connection');
+    await tor.startIfNotStarted();
+
     // Setup Tor connection logic here
-    console.log('Tor connection has been initialized.');
-  }
-
-  public async fetchData(endpoint: string): Promise<any> {
-    try {
-      const response = await fetch(`${this.baseURL}/${endpoint}`, {
-        method: 'GET',
-        headers: {
-          Authorization: this.authHeader,
-          'Content-Type': 'application/json',
-        },
-        // Additional configuration for Tor if necessary
-      });
-      if (!response.ok) {
-        throw new Error('API call failed: ' + response.statusText);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error('API call failed:', error);
-      throw error;
-    }
+    console.log('Tor connection has been initialized');
   }
 
   public async fetchUtxos(): Promise<UtxosResponse> {
     try {
-      const response = await fetch(`${this.baseURL}/utxos`, {
-        method: 'GET',
-        headers: {
-          Authorization: this.authHeader,
-          'Content-Type': 'application/json',
-        },
-        // Additional configuration for Tor if necessary
-      });
-      if (!response.ok) {
-        throw new Error('API call failed: ' + response.statusText);
+      if (!this.useTor) {
+        const response = await fetch(`${this.baseURL}/utxos`, {
+          method: 'GET',
+          headers: {
+            Authorization: this.authHeader,
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          throw new Error('API call failed: ' + response.statusText);
+        }
+        return await response.json();
+      } else {
+        await tor.startIfNotStarted();
+        const resp = await tor.get(`${this.baseURL}/utxos`, {
+          'Authorization': this.authHeader, 
+          'Content-Type': 'application/json'
+        })
+        return resp.json
       }
-      return await response.json();
     } catch (error) {console
       console.error('API call failed:', error);
       throw error
@@ -68,18 +63,26 @@ export class BlindBitAPIService {
 
   public async fetchHeight(): Promise<HeightResponse> {
     try {
-      const response = await fetch(`${this.baseURL}/height`, {
-        method: 'GET',
-        headers: {
-          Authorization: this.authHeader,
-          'Content-Type': 'application/json',
-        },
-        // Additional configuration for Tor if necessary
-      });
-      if (!response.ok) {
-        throw new Error('API call failed: ' + response.statusText);
+      if (!this.useTor) {
+        const response = await fetch(`${this.baseURL}/height`, {
+          method: 'GET',
+          headers: {
+            Authorization: this.authHeader,
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          throw new Error('API call failed: ' + response.statusText);
+        }
+        return await response.json();
+      } else {
+        await tor.startIfNotStarted();
+        const resp = await tor.get(`${this.baseURL}/height`, {
+          'Authorization': this.authHeader, 
+          'Content-Type': 'application/json'
+        })
+        return resp.json
       }
-      return await response.json();
     } catch (error) {
       console.error('API call failed:', error);
       throw error

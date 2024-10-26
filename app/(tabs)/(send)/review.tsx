@@ -10,8 +10,8 @@ import { Colors } from '@/constants/Colors';
 import { broadcastTxToMempoolSpace } from '@/api';
 import { router } from 'expo-router';
 
-export default function ConfirmTransaction() {
-  const { wallet } =  useAppContext();
+export default function ReviewTransaction() {
+  const { wallet, blindbitApiSettings } = useAppContext();
   const { psbt } = useSendContext();
   const [ actualFeeRate, setActualFeeRate ] = useState<number>(0)
   const [ tx, setTx ] = useState<bitcoin.Transaction | null>(null)
@@ -21,9 +21,9 @@ export default function ConfirmTransaction() {
     if (!wallet) return;
 
     try {
-      await broadcastTxToMempoolSpace(tx.toHex(), wallet.networkType)
-      // todo: add a tx confirmed/sent screen 
-      router.replace("/")
+      const txid = await broadcastTxToMempoolSpace(tx.toHex(), wallet.networkType, blindbitApiSettings?.tor)
+      console.log("confirmed txid:", txid)
+      router.replace("/confirmed")
     } catch (error) {
       throw error
     }
@@ -41,7 +41,7 @@ export default function ConfirmTransaction() {
   return (
     <MarginThemedView>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Confirm Transaction</ThemedText>
+        <ThemedText type="title">Review Transaction</ThemedText>
       </ThemedView>
       <Spacer magnitude={40}/>
       <ThemedView style={styles.dataContainer}>
@@ -70,7 +70,7 @@ export default function ConfirmTransaction() {
                 </ThemedView>
                 <ThemedView style={styles.outputField}>
                   <ThemedText type='default' style={{fontWeight: "bold"}}>Amount:</ThemedText>
-                  <ThemedText type='default'>{output.value} sats</ThemedText>
+                  <ThemedText type='default'>{output.value.toLocaleString(undefined, {maximumFractionDigits: 2})} sats</ThemedText>
                 </ThemedView>
               </ThemedView>
             );
@@ -80,7 +80,7 @@ export default function ConfirmTransaction() {
           <ThemedText type='subtitle'>Effective Fee Rate:</ThemedText>
           <ThemedText type='default'>
             {actualFeeRate.toLocaleString(undefined, {maximumFractionDigits: 2})} sats/vByte
-            (total: {psbt?.getFee()} sats)
+            (total: {psbt?.getFee().toLocaleString(undefined, {maximumFractionDigits: 2})} sats)
           </ThemedText>
         </ThemedView>
       </ThemedView>

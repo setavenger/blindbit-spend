@@ -1,4 +1,4 @@
-import { StyleSheet, Switch, Button, View } from 'react-native';
+import { StyleSheet, Switch, Button, View, Alert } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -33,6 +33,7 @@ function BlindBitBackendSettings() {
   const [user, setUser] = useState(blindbitApiSettings?.user || '')
   const [pass, setPass] = useState(blindbitApiSettings?.pass || '')
   const [tor, setTor] = useState(blindbitApiSettings?.tor || false)
+
   const toggleSwitch = () => setTor(prev => !prev);
 
   const confirmChanges = () => {
@@ -101,9 +102,29 @@ function BlindBitBackendSettings() {
 
 
 function WalletSettings() {
+  const { deleteWallet } = useAppContext()
 
   const deleteWalletData = () => {
-
+    Alert.alert(
+      "Deletion warning", 
+      `Are you sure you want to delete your wallet. The private keys will be lost from this device.`, 
+      [
+        {
+          text: "Cancel",
+          onPress: () => { return }, // abort transaction
+          style: 'cancel'
+        },
+        {
+          text: "Confirm",
+          onPress: async () => {
+            await deleteWallet()
+          },
+          style: 'default'
+        }
+      ],
+      { cancelable: false }
+    )
+    
   }
 
   return (

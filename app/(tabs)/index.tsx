@@ -68,10 +68,17 @@ export default function HomeScreen() {
             />
           </TouchableOpacity>
         </ThemedView>
-        {!wallet.mainnet && <ThemedView style={styles.testnetWarning}><ThemedText style={styles.testnetWarning}>{wallet.networkType}</ThemedText></ThemedView>}
+        {!wallet.mainnet && (
+          <ThemedView style={styles.testnetWarning}>
+            <ThemedText style={styles.testnetWarning}>
+              {wallet.networkType}
+            </ThemedText>
+          </ThemedView>
+        )}
         <ThemedView style={styles.body}>
           <ThemedText type='title'>{wallet && wallet.balance().toLocaleString()} Sats</ThemedText>
           {blindbitApiService == null ? <NoBlindBitBackendConfigured/> : null}
+          <ThemedText type='link' onPress={() => router.push('/utxos')}>View Coins</ThemedText>
         </ThemedView>
       </MarginThemedView>
   );

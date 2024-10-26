@@ -2,6 +2,7 @@ import { BlindBitAPIService } from "@/api/blindbit";
 import { Wallet } from "@/wallet";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { BlindBitApiSettings, deleteWalletFromDisk, loadBlindBitApiSettings, loadWalletFromDisk, saveBlindBitApiSettings, saveWalletToDisk } from "./storage";
+import { router } from "expo-router";
 
 export function useAppContext(): AppContextType {
   const context = useContext(AppContext)
@@ -45,6 +46,8 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
     try {
       await deleteWalletFromDisk()
       setWallet(null)
+      setAppState("New")
+      router.replace('/restore')
     } catch (error) {
       console.error(error)
       throw error
@@ -57,7 +60,7 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
   const updateBlindbitApiSettings = (settings: BlindBitApiSettings | null) => {
     if (settings == null) return;
     setBlindbitApiSettings({...settings});
-    const apiService = new BlindBitAPIService(settings.baseUrl, settings.user, settings.pass);
+    const apiService = new BlindBitAPIService(settings.baseUrl, settings.user, settings.pass, settings.tor);
     setBlindbitApiService(apiService);
   }
 
@@ -96,7 +99,6 @@ export function AppContextProvider({ children }: { children: React.ReactNode }) 
       throw error
     }
   }, []);
-
 
   useEffect(() => {
     if (!blindbitApiSettings) return;

@@ -19,7 +19,8 @@ export default function SendLayout() {
     <SendContextProvider>
       <Stack initialRouteName={'/index'}>
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="confirm" options={{ headerShown: false }} />
+        <Stack.Screen name="review" options={{ headerShown: false }} />
+        <Stack.Screen name="confirmed" options={{ headerShown: false }} />
       </Stack>
     </SendContextProvider>
   );

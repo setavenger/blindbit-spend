@@ -24,7 +24,7 @@ export default function TabLayout() {
           throw new Error("There should have been a wallet but none was found")
         }
         break
-      case 'New':
+      // case 'New':
       default:
         return <Redirect href="/restore" />;
     }
@@ -49,6 +49,7 @@ export default function TabLayout() {
         name="(send)"
         options={{
           title: 'Send',
+          unmountOnBlur: true,
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'paper-plane' : 'paper-plane-outline'} color={color} />
           ),

@@ -37,12 +37,43 @@ export default function SendScreen() {
   };
 
 
-  const createTx = () => {
+  const createTx = async () => {
     if (!wallet) {Alert.alert("no wallet is set up"); return};
+    if (fee < 5) {
+      Alert.alert(
+        "Fee warning", 
+        `Your chosen fee of ${fee} is very low`, 
+        [
+          {
+            text: "Cancel",
+            onPress: () => { return }, // abort transaction
+            style: 'cancel'
+          },
+          {
+            text: "Confirm",
+            onPress: () => {
+              try {
+                const newPsbt = wallet.makeTransaction([{address, value: amount}], fee);
+                updatePsbt(newPsbt);
+                router.push("/review")
+              } catch (error) {
+               console.error(error)
+               throw error 
+              }
+            },
+            style: 'default'
+          }
+        ],
+        { cancelable: false }
+      )
+      return;
+    }
+
+    // do normal if fee is not very low
     try {
       const newPsbt = wallet.makeTransaction([{address, value: amount}], fee);
       updatePsbt(newPsbt);
-      router.navigate("/confirm")
+      router.navigate("/review")
     } catch (error) {
      console.error(error)
      throw error 
