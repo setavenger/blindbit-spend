@@ -5,7 +5,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useAppContext } from "@/context";
 import { useEffect, useState } from "react";
-import { StyleSheet} from 'react-native';
+import { Linking, StyleSheet} from 'react-native';
 
 
 export default function UtxoViewScreen() {
@@ -26,18 +26,53 @@ export default function UtxoViewScreen() {
       <Spacer magnitude={40}/>
       <ThemedView>
         {utxos.map((utxo, index) => {
+          const openUtxoInMempool = async () => {
+            if (!wallet) return;
+            let baseUrl: string = "https://mempool.space";
+            if (wallet.networkType === "signet") {
+              baseUrl = `${baseUrl}/signet`
+            } else if (wallet.networkType == "testnet") {
+              baseUrl = `${baseUrl}/testnet`
+            }
+
+            const linkForTx = `${baseUrl}/tx/${utxo.txid}#vout=${utxo.vout}`
+            Linking.canOpenURL(linkForTx).then(supported => {
+              if (supported) {
+                Linking.openURL(linkForTx);
+              } else {
+                console.log("Don't know how to open URI: " + linkForTx);
+              }
+            });
+          };
+
           return (
             <ThemedView key={index} style={styles.utxoContainer}>
               <ThemedView style={styles.outputField}>
                 <ThemedText type='default' style={{fontWeight: "bold"}}>
-                  UTXO{utxo.label && utxo.label.m === 0 && " (change)"}:
+                  Outpoint{utxo.label && utxo.label.m === 0 && " (change)"}:
                 </ThemedText>
-                <ThemedText type='default'>{utxo.txid}:{utxo.vout}</ThemedText>
+                <ThemedText type='link' onPress={openUtxoInMempool}>
+                  {utxo.txid}:{utxo.vout}
+                </ThemedText>
               </ThemedView>
               <ThemedView style={styles.outputField}>
-                <ThemedText type='default' style={{fontWeight: "bold"}}>Amount:</ThemedText>
-                <ThemedText type='default'>{utxo.amount.toLocaleString(undefined, {maximumFractionDigits: 2})} sats</ThemedText>
+                <ThemedText type='default' style={{fontWeight: "bold"}}>
+                  Amount:
+                </ThemedText>
+                <ThemedText type='default'>
+                  {utxo.amount.toLocaleString(undefined, {maximumFractionDigits: 0})} sats
+                </ThemedText>
               </ThemedView>
+              {utxo.label && (
+                <ThemedView style={styles.outputField}>
+                  <ThemedText type='default' style={{fontWeight: "bold"}}>
+                    Label:
+                  </ThemedText>
+                  <ThemedText type='default'>
+                    {utxo.label && utxo.label.m.toLocaleString(undefined, {maximumFractionDigits: 0})}
+                  </ThemedText>
+                </ThemedView>
+              )}
               <ThemedView style={styles.outputField}>
                 <ThemedText type='default' style={{fontWeight: "bold"}}>Received:</ThemedText>
                 <ThemedText type='default'>
