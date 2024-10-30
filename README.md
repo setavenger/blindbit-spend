@@ -1,6 +1,9 @@
-# Welcome to your Expo app 👋
+# BlindBit Spend
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+The mobile app which neatly integrates with BlindBit Scan. It enables you to connect to your scanning instance, load the found utxos and then spend them easily within the App.
+
+> [!CAUTION]
+> This app is not extensively tested. It has worked for some simple sending but you should verify yourself that it works as you would exepct. The status of this app is not even early alpha yet. So as I said, use with caution.
 
 ## Get started
 
@@ -16,6 +19,11 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
     npx expo start
    ```
 
+    To run on a physical iOS device 
+   ```bash
+    npx expo run:ios --configuration Release --device
+   ```
+
 In the output, you'll find options to open the app in a
 
 - [development build](https://docs.expo.dev/develop/development-builds/introduction/)
@@ -23,28 +31,13 @@ In the output, you'll find options to open the app in a
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
+## Setting up in the App
 
-When you're ready, run:
+The app currently does not create new seed words. Those have to be generated outside the app. The devtools in [blindbitd](https://github.com/setavenger/blindbitd) can be used to extract the public spend key and the scan secret key for BlindBit Scan.
 
-```bash
-npm run reset-project
-```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Todos
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- [ ] Generate new seed words inside app
+- [ ] Show keys required for BlindBit Scan (spend public key + scan secret key)
