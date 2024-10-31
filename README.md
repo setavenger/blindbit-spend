@@ -19,7 +19,7 @@ The mobile app which neatly integrates with BlindBit Scan. It enables you to con
     npx expo start
    ```
 
-    To run on a physical iOS device 
+    To run on a physical iOS device (I don't have an android so android is not really tested at this point)
    ```bash
     npx expo run:ios --configuration Release --device
    ```
@@ -39,5 +39,6 @@ The app currently does not create new seed words. Those have to be generated out
 
 ## Todos
 
+- [ ] Test on Android
 - [ ] Generate new seed words inside app
 - [ ] Show keys required for BlindBit Scan (spend public key + scan secret key)

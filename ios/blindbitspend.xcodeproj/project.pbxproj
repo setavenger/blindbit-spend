@@ -348,7 +348,7 @@
 					"FB_SONARKIT_ENABLED=1",
 				);
 				INFOPLIST_FILE = blindbitspend/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Blind Bit";
+				INFOPLIST_KEY_CFBundleDisplayName = BlindBit;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -382,7 +382,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = N4KJS45H4D;
 				INFOPLIST_FILE = blindbitspend/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Blind Bit";
+				INFOPLIST_KEY_CFBundleDisplayName = BlindBit;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
