@@ -43,8 +43,14 @@ export class BlindBitAPIService {
             'Content-Type': 'application/json',
           },
         });
+        if (response.status < 200 || response.status > 299) {
+          console.log("status code:", response.status);
+        }
+        if (response.status === 401) {
+          throw new Error("unathorized");
+        }
         if (!response.ok) {
-          throw new Error('API call failed: ' + response.statusText);
+          throw new Error('utxo call not okay: ' + await response.text());
         }
         return await response.json();
       } else {
@@ -53,15 +59,16 @@ export class BlindBitAPIService {
           'Authorization': this.authHeader, 
           'Content-Type': 'application/json'
         })
-        return resp.json
+        return resp.json as UtxosResponse
       }
-    } catch (error) {console
-      console.error('API call failed:', error);
+    } catch (error) {
+      // logs before the inner error is thrown?!?
+      // console.error('utxo API call failed:', error);
       throw error
     }
   }
 
-  public async fetchHeight(): Promise<HeightResponse> {
+  public async fetchHeight(): Promise<number> {
     try {
       if (!this.useTor) {
         const response = await fetch(`${this.baseURL}/height`, {
@@ -71,20 +78,28 @@ export class BlindBitAPIService {
             'Content-Type': 'application/json',
           },
         });
-        if (!response.ok) {
-          throw new Error('API call failed: ' + response.statusText);
+        if (response.status < 200 || response.status > 299) {
+          console.log("status code:", response.status);
         }
-        return await response.json();
+        if (response.status === 401) {
+          throw new Error("unathorized");
+        }
+        if (!response.ok) {
+          throw new Error('height call not okay: ' + await response.text());
+        }
+        const data: HeightResponse = await response.json()
+        return data.height;
       } else {
         await tor.startIfNotStarted();
         const resp = await tor.get(`${this.baseURL}/height`, {
           'Authorization': this.authHeader, 
           'Content-Type': 'application/json'
         })
-        return resp.json
+        const data: HeightResponse = resp.json;
+        return data.height;
       }
     } catch (error) {
-      console.error('API call failed:', error);
+      console.error('height API call failed:', error);
       throw error
     }
   }

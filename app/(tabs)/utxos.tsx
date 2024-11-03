@@ -1,11 +1,11 @@
 import { Utxo } from "@/api";
 import { MarginThemedScrollView } from "@/components/MarginThemedView";
 import { Spacer } from "@/components/Spacer";
-import { ThemedText } from "@/components/ThemedText";
+import { ThemedText, ThemedTextCopiable } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useAppContext } from "@/context";
 import { useEffect, useState } from "react";
-import { Linking, StyleSheet} from 'react-native';
+import { StyleSheet} from 'react-native';
 
 
 export default function UtxoViewScreen() {
@@ -26,34 +26,13 @@ export default function UtxoViewScreen() {
       <Spacer magnitude={40}/>
       <ThemedView>
         {utxos.map((utxo, index) => {
-          const openUtxoInMempool = async () => {
-            if (!wallet) return;
-            let baseUrl: string = "https://mempool.space";
-            if (wallet.networkType === "signet") {
-              baseUrl = `${baseUrl}/signet`
-            } else if (wallet.networkType == "testnet") {
-              baseUrl = `${baseUrl}/testnet`
-            }
-
-            const linkForTx = `${baseUrl}/tx/${utxo.txid}#vout=${utxo.vout}`
-            Linking.canOpenURL(linkForTx).then(supported => {
-              if (supported) {
-                Linking.openURL(linkForTx);
-              } else {
-                console.log("Don't know how to open URI: " + linkForTx);
-              }
-            });
-          };
-
           return (
             <ThemedView key={index} style={styles.utxoContainer}>
               <ThemedView style={styles.outputField}>
                 <ThemedText type='default' style={{fontWeight: "bold"}}>
                   Outpoint{utxo.label && utxo.label.m === 0 && " (change)"}:
                 </ThemedText>
-                <ThemedText type='link' onPress={openUtxoInMempool}>
-                  {utxo.txid}:{utxo.vout}
-                </ThemedText>
+                <ThemedTextCopiable type="default" text={`${utxo.txid}:${utxo.vout}`}/>
               </ThemedView>
               <ThemedView style={styles.outputField}>
                 <ThemedText type='default' style={{fontWeight: "bold"}}>

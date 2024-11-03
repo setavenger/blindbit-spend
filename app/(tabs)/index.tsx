@@ -9,41 +9,48 @@ import { useAppContext } from '@/context';
 import { router } from 'expo-router';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
+type syncState = "nothing" | "fetching" | "failed"
+
 export default function HomeScreen() {
   const { blindbitApiService, wallet, updateWallet } = useAppContext()
-  const [syncHeight, setSyncHeight] = useState(0);
+  const [ syncHeight, setSyncHeight ] = useState(0);
+  const [ syncState, setSyncState ] = useState<syncState>("nothing")
+  const [ error, setError ] = useState<any>(null)
 
-  const refreshWallet = () => {
+  const refreshWallet = async () => {
+    setError(null); // reset before api calls
+    setSyncState("fetching")
     if (blindbitApiService == null) {
-      // console.warn("blindbitApiService is null");
+      console.warn("blindbitApiService is null");
+      setSyncState("failed")
+      setError("no service given")
       return;
     };
 
-    blindbitApiService.fetchHeight()
-    .then(resp => {
-      setSyncHeight(resp.height);
-    })
-    .catch(error => {
-      console.error(error);
-      throw error;
-    });
-
-    blindbitApiService.fetchUtxos()
-    .then(resp => {
-      if (!wallet) { console.log("wallet was null"); return };
-      wallet.setUtxos(resp);
+    try {
+      const height = await blindbitApiService.fetchHeight()
+      setSyncHeight(height)
+      if (!wallet) { 
+        console.log("wallet was null"); 
+        return 
+      };
+      const utxos = await blindbitApiService.fetchUtxos()
+      wallet.setUtxos(utxos);
       updateWallet(wallet);
-    })
-    .catch(error => {
+    } catch (error) {
+      setSyncState("failed")
       console.error(error);
+      setError(error)
       throw error;
-    });
+    }
+    setSyncState("nothing")
   }
 
   // load Data
   useEffect(() => {
+    if (!blindbitApiService) return;
     refreshWallet()
-  }, []);
+  }, [blindbitApiService]);
 
 
   if (!wallet) {
@@ -58,15 +65,18 @@ export default function HomeScreen() {
       <MarginThemedView>
         <ThemedView style={styles.topBar}>
           <ThemedText>Height: {syncHeight.toLocaleString()}</ThemedText>
-          <TouchableOpacity
-            onPress={()=> {refreshWallet()}}
-          >
-            <Ionicons 
-              size={28} 
-              name={'refresh'}
-              color={useThemeColor({light: "", dark: ""}, "text")}
-            />
-          </TouchableOpacity>
+          <ThemedView>
+            <TouchableOpacity onPress={()=> {refreshWallet()}}>
+              <Ionicons 
+                size={28} 
+                name={'refresh'}
+                color={useThemeColor({light: "", dark: ""}, "text")}
+              />
+            </TouchableOpacity>
+          </ThemedView>
+        </ThemedView>
+        <ThemedView style={{flexDirection: 'row-reverse', width: '100%'}}>
+          <ThemedText type='default'>{syncState === 'nothing' ? ' ' : syncState}</ThemedText>
         </ThemedView>
         {!wallet.mainnet && (
           <ThemedView style={styles.testnetWarning}>
@@ -75,6 +85,13 @@ export default function HomeScreen() {
             </ThemedText>
           </ThemedView>
         )}
+        {
+          <ThemedView style={styles.testnetWarning}>
+            <ThemedText style={{color: 'red'}}>
+              {`${error || ""}`}
+            </ThemedText>
+          </ThemedView>
+        }
         <ThemedView style={styles.body}>
           <ThemedText type='title'>{wallet && wallet.balance().toLocaleString()} Sats</ThemedText>
           {blindbitApiService == null ? <NoBlindBitBackendConfigured/> : null}
@@ -95,13 +112,6 @@ function NoBlindBitBackendConfigured() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1, 
-    backgroundColor: 'transparent'
-  },
-  container: {
-    flex: 1,
-  },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
