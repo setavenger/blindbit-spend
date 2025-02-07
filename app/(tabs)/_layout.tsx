@@ -10,7 +10,7 @@ import { MarginThemedView } from '@/components/MarginThemedView';
 import { ThemedText } from '@/components/ThemedText';
 
 export default function TabLayout() {
-  const {wallet, appState} = useAppContext()
+  const { wallet, appState } = useAppContext()
 
   const colorScheme = useColorScheme();
 
@@ -65,6 +65,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="utxos"
+        options={{
+          title: 'UTXOs',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'cog' : 'cog-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',
@@ -82,9 +91,9 @@ export type WaitingScreenProps = ViewProps & {
 };
 
 
-function WaitingScreen({waitText, style, ...otherProps}: WaitingScreenProps) {
+function WaitingScreen({ waitText, style, ...otherProps }: WaitingScreenProps) {
   return (
-    <MarginThemedView style={[{flex: 1, alignItems: 'center'}, style]} {...otherProps}>
+    <MarginThemedView style={[{ flex: 1, alignItems: 'center' }, style]} {...otherProps}>
       <ThemedText type='title'>{waitText}</ThemedText>
     </MarginThemedView>
   )

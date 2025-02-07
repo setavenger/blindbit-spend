@@ -1,13 +1,13 @@
 import { network } from '@/wallet';
 import Tor from "react-native-tor";
+import { tor } from './blindbit';
 
-const tor = Tor()
 // const MempoolApiMain = "https://mempool.space/api"
 // const MempoolApiSignet = "https://mempool.space/signet/api"
 // const MempoolApitestnet = "https://mempool.space/testnet/api"
 
 const MempoolClearnetAddress = "https://mempool.space"
-const MempoolOnionAddress = "mempoolhqx4isw62xs7abwphsq7ldayuidyx2v2oethdhhj6mlo2r6ad.onion"
+const MempoolOnionAddress = "http://mempoolhqx4isw62xs7abwphsq7ldayuidyx2v2oethdhhj6mlo2r6ad.onion"
 
 // todo: enable broadcast through electrum/blindbit scan as a proxy
 //
@@ -25,14 +25,14 @@ export async function broadcastTxToMempoolSpace(txHex: string, network: network,
     fullUrl = `${baseUrl}/signet/api`
   } else if (network === 'testnet') {
     fullUrl = `${baseUrl}/testnet/api`
-  }  
-  if (baseUrl === "") {
+  }
+  if (fullUrl === "") {
     throw Error("baseUrl still empty")
   }
 
   try {
     if (!tor) {
-      const response = await fetch(`${baseUrl}/tx`, {
+      const response = await fetch(`${fullUrl}/tx`, {
         headers: {
           'Content-Type': 'text/plain',
         },
@@ -48,8 +48,14 @@ export async function broadcastTxToMempoolSpace(txHex: string, network: network,
       }
       return await response.text();
     } else {
+      console.log(fullUrl);
       await tor.startIfNotStarted();
-      const resp = tor.post(baseUrl, txHex)
+      const resp = await tor.post(`${fullUrl}/tx`, txHex);
+
+      console.log(resp);
+      console.log(resp.b64Data);
+      console.log(resp.json);
+      console.log(resp.respCode);
 
       return ""
     }

@@ -3,7 +3,7 @@ import Tor from "react-native-tor";
 
 let Buffer = require('buffer/').Buffer;
 
-const tor = Tor()
+export const tor = Tor()
 
 export class BlindBitAPIService {
   baseURL: string;
@@ -13,7 +13,7 @@ export class BlindBitAPIService {
   useTor: boolean;
 
   constructor(baseURL: string, username: string, password: string, useTor: boolean = false) {
-    this.baseURL = baseURL.replace(/\/$/,""); // todo might want to use slice instead
+    this.baseURL = baseURL.replace(/\/$/, ""); // todo might want to use slice instead
     this.username = username;
     this.password = password;
     this.authHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
@@ -56,7 +56,7 @@ export class BlindBitAPIService {
       } else {
         await tor.startIfNotStarted();
         const resp = await tor.get(`${this.baseURL}/utxos`, {
-          'Authorization': this.authHeader, 
+          'Authorization': this.authHeader,
           'Content-Type': 'application/json'
         })
         return resp.json as UtxosResponse
@@ -92,7 +92,7 @@ export class BlindBitAPIService {
       } else {
         await tor.startIfNotStarted();
         const resp = await tor.get(`${this.baseURL}/height`, {
-          'Authorization': this.authHeader, 
+          'Authorization': this.authHeader,
           'Content-Type': 'application/json'
         })
         const data: HeightResponse = resp.json;
