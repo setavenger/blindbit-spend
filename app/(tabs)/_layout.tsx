@@ -1,6 +1,5 @@
 import { ViewProps } from 'react-native';
 import { Redirect, Tabs } from 'expo-router';
-import React, { useEffect } from 'react';
 
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
@@ -69,7 +68,7 @@ export default function TabLayout() {
         options={{
           title: 'UTXOs',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'cog' : 'cog-outline'} color={color} />
+            <TabBarIcon name={focused ? 'list' : 'list-outline'} color={color} />
           ),
         }}
       />

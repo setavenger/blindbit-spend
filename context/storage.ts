@@ -1,6 +1,6 @@
 import { Utxo } from "@/api/blindbit";
 import { Wallet, network } from "@/wallet";
-import RNSecureKeyStore, {ACCESSIBLE} from 'react-native-secure-key-store';
+import RNSecureKeyStore, { ACCESSIBLE } from 'react-native-secure-key-store';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { ec } from 'elliptic';
@@ -11,6 +11,7 @@ export const StorageKeys = {
   IsTorEnabled: 'is_tor_enabled',
   Wallet: 'wallet',
   BlindBitApiSettings: 'blindbit_api_settings',
+  BlindBitNwcSettings: 'blindbit_nwc_settings',
 };
 
 /**
@@ -27,7 +28,7 @@ export interface DiskWallet {
   networkType: network
 }
 
-export const saveWalletToDisk = async (wallet: Wallet ) => {
+export const saveWalletToDisk = async (wallet: Wallet) => {
   console.log('saving wallet data');
 
   // strip down wallet to save space
@@ -74,7 +75,7 @@ export const loadWalletFromDisk = async (): Promise<Wallet | null> => {
     if (err !== '[Error: {"message":"key does not present"}]') {
       console.log(err);
       return null
-    } 
+    }
     throw err
   }
 };
@@ -101,7 +102,13 @@ export async function saveBlindBitApiSettings(data: BlindBitApiSettings) {
   });
 }
 
-export async function loadBlindBitApiSettings(): Promise<BlindBitApiSettings|null>{
+export async function saveBlindBitNwcUri(nwcUri: string) {
+  await RNSecureKeyStore.set(StorageKeys.BlindBitNwcSettings, nwcUri, {
+    accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+  });
+}
+
+export async function loadBlindBitApiSettings(): Promise<BlindBitApiSettings | null> {
   try {
     const data = await RNSecureKeyStore.get(StorageKeys.BlindBitApiSettings);
     const res: BlindBitApiSettings = JSON.parse(data);
@@ -113,8 +120,22 @@ export async function loadBlindBitApiSettings(): Promise<BlindBitApiSettings|nul
     if (err !== '[Error: {"message":"key does not present"}]') {
       console.log(err);
       return null
-    } 
+    }
     throw err
   }
 }
 
+
+export async function loadBlindBitNwcSettings(): Promise<string> {
+  try {
+    return await RNSecureKeyStore.get(StorageKeys.BlindBitNwcSettings) as string
+  } catch (err) {
+    // only log the error if it's not the standard error for not having data stored
+    // no logs for the startup case
+    // todo maybe rethink to just know where it comes from
+    if (err !== '[Error: {"message":"key does not present"}]') {
+      console.log(err);
+    }
+    throw err
+  }
+}

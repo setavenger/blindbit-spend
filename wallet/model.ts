@@ -1,4 +1,4 @@
-import { Utxo, utxoState } from "@/api/blindbit";
+import { Utxo, utxoState } from "@/api";
 import { encodeSilentPaymentAddress, generateChangeLabel } from "@/splib";
 import { ec } from 'elliptic';
 import elliptic from 'elliptic';
@@ -67,13 +67,13 @@ export class Wallet {
     }
 
     // this.address = encodeSilentPaymentAddress(scan, spend, this.mainnet ? 'sp' : 'sp' , 0); // change back to tsp
-    this.address = encodeSilentPaymentAddress(scan, spend, this.mainnet ? 'sp' : 'tsp' , 0);
+    this.address = encodeSilentPaymentAddress(scan, spend, this.mainnet ? 'sp' : 'tsp', 0);
     const changePubKeyBytes = generateChangeLabel(scan);
     const changePubKey = secp256k1.keyFromPublic(changePubKeyBytes);
     // important to add the parity to the public keys otherwise the sum could have the wrong parity
     const combinedLabelKey = ecc.pointAdd(getBytes(changePubKey, false), getBytes(this.spendSecretKey, false)) as Buffer
     const labelKey = secp256k1.keyFromPublic(combinedLabelKey)
-    this.changeAddress = encodeSilentPaymentAddress(scan, labelKey, this.mainnet ? 'sp' : 'tsp' , 0); // change back to tsp
+    this.changeAddress = encodeSilentPaymentAddress(scan, labelKey, this.mainnet ? 'sp' : 'tsp', 0); // change back to tsp
   }
 
   /**
@@ -106,7 +106,7 @@ export class Wallet {
       if (states.indexOf(utxo.utxo_state) > -1) return utxo
     })
   }
- 
+
   // returns transaction hex || maybe we should return PSBT instead??
   public makeTransaction(recipients: Recipient[], feeRate: number, states: utxoState[] = ['unspent']): bitcoin.Psbt {
     let utxos: InputUTXO[] = [];
@@ -135,7 +135,7 @@ export class Wallet {
 
     let targetsRaw = [];
     for (const recipient of recipients) {
-      targetsRaw.push({address: recipient.address, value: recipient.value});
+      targetsRaw.push({ address: recipient.address, value: recipient.value });
     }
 
     interface CoinSelectResult {
@@ -146,13 +146,14 @@ export class Wallet {
     // currently sending to sp addresses results in slightly too low fees.
     // one would have to temporarily replace the address with a bc1p... address 
     // so coinselect recognises that as a p2tr address which is larger than p2wpkh
+    // todo: fix annoying linting/type "error"
     let result: CoinSelectResult = coinselect(utxos, targetsRaw, feeRate);
     let { inputs, outputs, fee } = result;
 
     console.log(`fee will be ${fee} sats`);
     // todo assert fee
 
-    if (!inputs || !outputs) throw new Error("no possible solution");   
+    if (!inputs || !outputs) throw new Error("no possible solution");
 
     // attach change address to output without address
     outputs.forEach((out: Output) => {
@@ -166,15 +167,23 @@ export class Wallet {
     const sp = new SilentPayment();
 
     // const targets = sp.createTransaction(inputs, outputs, bitcoin.networks.testnet);
-    const targets = sp.createTransaction(inputs, outputs, this.network === bitcoin.networks.bitcoin, this.network);
+    const targets = sp.createTransaction(
+      inputs,
+      outputs,
+      this.network === bitcoin.networks.bitcoin,
+      this.network,
+    );
 
     // create psbt | might need to specify network
-    //make this dependant on wallet mainnet flag
-    const psbt = new bitcoin.Psbt({network: this.network});
+    // make this dependant on wallet mainnet flag
+    console.log("network:", this.network);
+    const psbt = new bitcoin.Psbt({ network: this.network });
+    // const psbt = new bitcoin.Psbt();
 
     inputs.forEach((input) => {
       const rawKey = ECPair.fromWIF(input.wif).publicKey
       const publicKey = Buffer.from(rawKey)
+      console.log("pub", publicKey)
       psbt.addInput({
         hash: input.txid,
         index: input.vout,
@@ -183,10 +192,12 @@ export class Wallet {
       });
     });
 
+    console.log("set 2");
+
     targets.forEach(out => {
       if (!out.address) throw new Error("an address was missing");
       if (!out.value) throw new Error("a value was missing");
-      
+
       psbt.addOutput({
         address: out.address,
         value: out.value,

@@ -25,14 +25,6 @@ export class BlindBitAPIService {
     }
   }
 
-  private async setupTorConnection() {
-    console.log('Setting up tor connection');
-    await tor.startIfNotStarted();
-
-    // Setup Tor connection logic here
-    console.log('Tor connection has been initialized');
-  }
-
   public async fetchUtxos(): Promise<UtxosResponse> {
     try {
       if (!this.useTor) {
@@ -69,6 +61,7 @@ export class BlindBitAPIService {
   }
 
   public async fetchHeight(): Promise<number> {
+    console.log(this.baseURL);
     try {
       if (!this.useTor) {
         const response = await fetch(`${this.baseURL}/height`, {
@@ -90,8 +83,11 @@ export class BlindBitAPIService {
         const data: HeightResponse = await response.json()
         return data.height;
       } else {
+        console.log("using tor")
+        const fullUrl = `${this.baseURL}/height`
+        console.log(fullUrl);
         await tor.startIfNotStarted();
-        const resp = await tor.get(`${this.baseURL}/height`, {
+        const resp = await tor.get(fullUrl, {
           'Authorization': this.authHeader,
           'Content-Type': 'application/json'
         })

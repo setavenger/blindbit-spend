@@ -1,12 +1,12 @@
 'use strict';
-Object.defineProperty(exports, '__esModule', {value: true});
+Object.defineProperty(exports, '__esModule', { value: true });
 exports.Transaction = void 0;
 const bufferutils_1 = require('./bufferutils');
 const bcrypto = require('./crypto');
 const bscript = require('./script');
 const script_1 = require('./script');
 const types = require('./types');
-const {typeforce} = types;
+const { typeforce } = types;
 function varSliceSize(someScript) {
   const length = someScript.length;
   return bufferutils_1.varuint.encodingLength(length) + length;
@@ -46,12 +46,13 @@ class Transaction {
     this.outs = [];
   }
   static fromBuffer(buffer, _NO_STRICT) {
-    const bufferReader = new bufferutils_1.BufferReader(buffer);
+    const bufferReader = new bufferutils_1.BufferReader(buffer, 0);
     const tx = new Transaction();
     tx.version = bufferReader.readInt32();
     const marker = bufferReader.readUInt8();
     const flag = bufferReader.readUInt8();
     let hasWitnesses = false;
+    console.log("offset-start:", bufferReader.offset)
     if (
       marker === Transaction.ADVANCED_TRANSACTION_MARKER &&
       flag === Transaction.ADVANCED_TRANSACTION_FLAG
@@ -61,6 +62,7 @@ class Transaction {
       bufferReader.offset -= 2;
     }
     const vinLen = bufferReader.readVarInt();
+    console.log("offset-1234:", bufferReader.offset)
     for (let i = 0; i < vinLen; ++i) {
       tx.ins.push({
         hash: bufferReader.readSlice(32),
@@ -86,6 +88,7 @@ class Transaction {
         throw new Error('Transaction has superfluous witness data');
       }
     }
+    console.log("offset-short-before:", bufferReader.offset)
     tx.locktime = bufferReader.readUInt32();
     if (_NO_STRICT) {
       return tx;
@@ -173,8 +176,8 @@ class Transaction {
       }, 0) +
       (hasWitnesses
         ? this.ins.reduce((sum, input) => {
-            return sum + vectorSize(input.witness);
-          }, 0)
+          return sum + vectorSize(input.witness);
+        }, 0)
         : 0)
     );
   }

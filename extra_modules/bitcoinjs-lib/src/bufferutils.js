@@ -1,5 +1,5 @@
 'use strict';
-Object.defineProperty(exports, '__esModule', {value: true});
+Object.defineProperty(exports, '__esModule', { value: true });
 exports.BufferReader =
   exports.BufferWriter =
   exports.cloneBuffer =
@@ -7,9 +7,9 @@ exports.BufferReader =
   exports.writeUInt64LE =
   exports.readUInt64LE =
   exports.varuint =
-    void 0;
+  void 0;
 const types = require('./types');
-const {typeforce} = types;
+const { typeforce } = types;
 const varuint = require('varuint-bitcoin');
 exports.varuint = varuint;
 // https://github.com/feross/buffer/blob/master/index.js#L1127
@@ -133,6 +133,7 @@ class BufferReader {
     return result;
   }
   readUInt32() {
+    console.log("offset-u32:", this.offset);
     const result = this.buffer.readUInt32LE(this.offset);
     this.offset += 4;
     return result;
@@ -143,8 +144,9 @@ class BufferReader {
     return result;
   }
   readVarInt() {
+    console.log("offset-varint:", this.offset);
     const vi = varuint.decode(this.buffer, this.offset);
-    this.offset += varuint.decode.bytes;
+    this.offset += vi.bytes;
     return vi;
   }
   readSlice(n) {
