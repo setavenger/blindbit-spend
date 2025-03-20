@@ -5,7 +5,7 @@ import elliptic from 'elliptic';
 import { SilentPayment } from '../extra_modules/bw_sp_module'
 // import { SilentPayment } from 'silent-payments'
 import { InputUTXO, Output, Recipient } from "./send";
-import * as bitcoin from '../extra_modules/bitcoinjs-lib/src';
+import * as bitcoin from '@/extra_modules/bitcoinjs-lib/src';
 // import * as bitcoin from 'bitcoinjs-lib';
 // import coinselect from 'coinselect'; // look at bluewallet, they have typed coinselect in a custom module
 import coinselect from 'bitcoinselect'; // look at bluewallet, they have typed coinselect in a custom module
@@ -176,14 +176,12 @@ export class Wallet {
 
     // create psbt | might need to specify network
     // make this dependant on wallet mainnet flag
-    console.log("network:", this.network);
     const psbt = new bitcoin.Psbt({ network: this.network });
     // const psbt = new bitcoin.Psbt();
 
     inputs.forEach((input) => {
       const rawKey = ECPair.fromWIF(input.wif).publicKey
       const publicKey = Buffer.from(rawKey)
-      console.log("pub", publicKey)
       psbt.addInput({
         hash: input.txid,
         index: input.vout,
@@ -203,14 +201,17 @@ export class Wallet {
         value: out.value,
       });
     });
+    console.log("set 3");
 
     // sign inputs
     for (let i = 0; i < inputs.length; i++) {
       let key = ECPair.fromWIF(inputs[i].wif);
       psbt.signInput(i, key);
     }
+    console.log("set 4");
 
     psbt.finalizeAllInputs();
+    console.log("set 5");
 
     const txHex = psbt.extractTransaction(true).toHex();
     console.log('Transaction Hex:', txHex);

@@ -1,5 +1,4 @@
 import { UTXOType } from "silent-payments";
-import { UTXO } from "bitcoinselect";
 
 let Buffer = require('buffer/').Buffer;
 

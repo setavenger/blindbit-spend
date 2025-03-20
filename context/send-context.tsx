@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from 'react';
-import * as bitcoin from '../extra_modules/bitcoinjs-lib/src';
+import * as bitcoin from '@/extra_modules/bitcoinjs-lib/src';
 
 export function useSendContext(): SendContextType {
   const context = useContext(SendContext)
@@ -13,7 +13,7 @@ type SendContextType = {
   psbt: bitcoin.Psbt | null;
   updatePsbt: (psbt: bitcoin.Psbt) => void;
 }
- 
+
 const SendContext = createContext<SendContextType | null>(null);
 
 export function SendContextProvider({ children }: { children: React.ReactNode }) {
@@ -24,8 +24,8 @@ export function SendContextProvider({ children }: { children: React.ReactNode })
   }
 
   return (
-    <SendContext.Provider 
-      value={{ 
+    <SendContext.Provider
+      value={{
         psbt,
         updatePsbt,
       }}>

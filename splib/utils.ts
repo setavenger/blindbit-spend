@@ -1,5 +1,5 @@
 import { ec } from 'elliptic';
-import * as bitcoin from 'bitcoinjs-lib';
+import * as bitcoin from '@/extra_modules/bitcoinjs-lib/src';
 
 let Buffer = require('buffer/').Buffer;
 

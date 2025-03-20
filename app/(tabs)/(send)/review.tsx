@@ -1,4 +1,4 @@
-import { Button, StyleSheet} from 'react-native';
+import { Button, StyleSheet } from 'react-native';
 import { MarginThemedView } from "@/components/MarginThemedView";
 import { Spacer } from "@/components/Spacer";
 import { ThemedText, ThemedTextCopiable } from "@/components/ThemedText";
@@ -13,8 +13,8 @@ import { router } from 'expo-router';
 export default function ReviewTransaction() {
   const { wallet, blindbitApiSettings } = useAppContext();
   const { psbt } = useSendContext();
-  const [ actualFeeRate, setActualFeeRate ] = useState<number>(0)
-  const [ tx, setTx ] = useState<bitcoin.Transaction | null>(null)
+  const [actualFeeRate, setActualFeeRate] = useState<number>(0)
+  const [tx, setTx] = useState<bitcoin.Transaction | null>(null)
 
   const broadcastTx = async () => {
     if (!tx) return;
@@ -34,7 +34,7 @@ export default function ReviewTransaction() {
     const currTx = psbt.extractTransaction()
     setTx(currTx)
     const feeRate = psbt.getFee() / currTx.virtualSize()
-    setActualFeeRate(feeRate)
+    setActualFeeRate(Number(feeRate))
   }, [psbt])
 
 
@@ -43,14 +43,14 @@ export default function ReviewTransaction() {
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Review Transaction</ThemedText>
       </ThemedView>
-      <Spacer magnitude={40}/>
+      <Spacer magnitude={40} />
       <ThemedView style={styles.dataContainer}>
         <ThemedView style={styles.dataField}>
           <ThemedText type='subtitle'>Txid:</ThemedText>
-          <ThemedTextCopiable type='default' text={tx?.getId()}/>
+          <ThemedTextCopiable type='default' text={tx?.getId()} />
         </ThemedView>
         {/* Outputs */}
-        <ThemedView style={{flexDirection: 'column', gap: 12}}>
+        <ThemedView style={{ flexDirection: 'column', gap: 12 }}>
           <ThemedText type='subtitle'>Outputs:</ThemedText>
           {tx?.outs.map((output, index) => {
             let addr;
@@ -65,12 +65,12 @@ export default function ReviewTransaction() {
             return (
               <ThemedView key={index}>
                 <ThemedView style={styles.outputField}>
-                  <ThemedText type='default' style={{fontWeight: "bold"}}>Address{index === tx.outs.length-1 && " (change)"}:</ThemedText>
+                  <ThemedText type='default' style={{ fontWeight: "bold" }}>Address{index === tx.outs.length - 1 && " (change)"}:</ThemedText>
                   <ThemedText type='default'>{addr}</ThemedText>
                 </ThemedView>
                 <ThemedView style={styles.outputField}>
-                  <ThemedText type='default' style={{fontWeight: "bold"}}>Amount:</ThemedText>
-                  <ThemedText type='default'>{output.value.toLocaleString(undefined, {maximumFractionDigits: 2})} sats</ThemedText>
+                  <ThemedText type='default' style={{ fontWeight: "bold" }}>Amount:</ThemedText>
+                  <ThemedText type='default'>{output.value.toLocaleString(undefined, { maximumFractionDigits: 2 })} sats</ThemedText>
                 </ThemedView>
               </ThemedView>
             );
@@ -79,18 +79,18 @@ export default function ReviewTransaction() {
         <ThemedView style={styles.dataField}>
           <ThemedText type='subtitle'>Effective Fee Rate:</ThemedText>
           <ThemedText type='default'>
-            {actualFeeRate.toLocaleString(undefined, {maximumFractionDigits: 2})} sats/vByte
-            (total: {psbt?.getFee().toLocaleString(undefined, {maximumFractionDigits: 2})} sats)
+            {actualFeeRate.toLocaleString(undefined, { maximumFractionDigits: 2 })} sats/vByte
+            (total: {psbt?.getFee().toLocaleString(undefined, { maximumFractionDigits: 2 })} sats)
           </ThemedText>
         </ThemedView>
       </ThemedView>
-      <Spacer magnitude={40}/>
-      <ThemedView style={{backgroundColor: Colors['light'].tint}}>
-        <Button 
+      <Spacer magnitude={40} />
+      <ThemedView style={{ backgroundColor: Colors['light'].tint }}>
+        <Button
           title={'Broadcast Tx'}
           onPress={broadcastTx}
           color={'white'}
-        />  
+        />
       </ThemedView>
     </MarginThemedView>
   )
