@@ -1,3 +1,3 @@
 
-export * from './api-service'
-export * from './models'
+export * from './models';
+export * from './nwc';

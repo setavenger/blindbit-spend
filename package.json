@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
-    "@getalby/sdk": "file:../../ts-nwc-silent-payments",
+    "@getalby/sdk": "https://github.com/setavenger/ts-nwc-silent-payments.git",
     "@noble/secp256k1": "1.6.3",
     "@react-native-async-storage/async-storage": "^1.24.0",
     "@react-native-clipboard/clipboard": "^1.14.1",
@@ -61,7 +61,6 @@
     "react-native-screens": "3.31.1",
     "react-native-secure-key-store": "^2.0.10",
     "react-native-svg": "^15.4.0",
-    "react-native-tor": "^0.1.8",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.19.10",
     "react-number-format": "^5.4.0",

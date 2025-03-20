@@ -10,7 +10,6 @@ const secp256k1 = new ec('secp256k1');
 export const StorageKeys = {
   IsTorEnabled: 'is_tor_enabled',
   Wallet: 'wallet',
-  BlindBitApiSettings: 'blindbit_api_settings',
   BlindBitNwcSettings: 'blindbit_nwc_settings',
 };
 
@@ -89,42 +88,11 @@ export const deleteWalletFromDisk = async (): Promise<void> => {
   }
 }
 
-export interface BlindBitApiSettings {
-  baseUrl: string
-  user: string
-  pass: string
-  tor: boolean
-}
-
-export async function saveBlindBitApiSettings(data: BlindBitApiSettings) {
-  await RNSecureKeyStore.set(StorageKeys.BlindBitApiSettings, JSON.stringify(data), {
-    accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-  });
-}
-
 export async function saveBlindBitNwcUri(nwcUri: string) {
   await RNSecureKeyStore.set(StorageKeys.BlindBitNwcSettings, nwcUri, {
     accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
   });
 }
-
-export async function loadBlindBitApiSettings(): Promise<BlindBitApiSettings | null> {
-  try {
-    const data = await RNSecureKeyStore.get(StorageKeys.BlindBitApiSettings);
-    const res: BlindBitApiSettings = JSON.parse(data);
-    return res
-  } catch (err) {
-    // only log the error if it's not the standard error for not having a wallet stored
-    // no logs for the startup case
-    // todo maybe rethink to just know where it comes from
-    if (err !== '[Error: {"message":"key does not present"}]') {
-      console.log(err);
-      return null
-    }
-    throw err
-  }
-}
-
 
 export async function loadBlindBitNwcSettings(): Promise<string> {
   try {

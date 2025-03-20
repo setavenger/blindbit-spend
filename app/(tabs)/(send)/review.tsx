@@ -11,7 +11,7 @@ import { broadcastTxToMempoolSpace } from '@/api';
 import { router } from 'expo-router';
 
 export default function ReviewTransaction() {
-  const { wallet, blindbitApiSettings } = useAppContext();
+  const { wallet } = useAppContext();
   const { psbt } = useSendContext();
   const [actualFeeRate, setActualFeeRate] = useState<number>(0)
   const [tx, setTx] = useState<bitcoin.Transaction | null>(null)
@@ -21,7 +21,7 @@ export default function ReviewTransaction() {
     if (!wallet) return;
 
     try {
-      const txid = await broadcastTxToMempoolSpace(tx.toHex(), wallet.networkType, blindbitApiSettings?.tor)
+      const txid = await broadcastTxToMempoolSpace(tx.toHex(), wallet.networkType)
       console.log("confirmed txid:", txid)
       router.replace("/confirmed")
     } catch (error) {
