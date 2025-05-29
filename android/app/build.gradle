@@ -192,9 +192,6 @@ dependencies {
     } else {
         implementation jscFlavor
     }
-    
-    // react native tor
-    implementation files("../../node_modules/react-native-tor/android/libs/sifir_android.aar")
 }
 
 if (rnVersion < versionToNumber(0, 75, 0)) {

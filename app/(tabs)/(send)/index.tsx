@@ -147,7 +147,7 @@ export default function SendScreen() {
           <Button 
             title={'Confirm'}
             onPress={createTx}
-            color={'white'}
+            color={'gray'}
           />
         </ThemedView>
       </ThemedView>

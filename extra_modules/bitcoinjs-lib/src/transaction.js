@@ -52,7 +52,7 @@ class Transaction {
     const marker = bufferReader.readUInt8();
     const flag = bufferReader.readUInt8();
     let hasWitnesses = false;
-    console.log("offset-start:", bufferReader.offset)
+
     if (
       marker === Transaction.ADVANCED_TRANSACTION_MARKER &&
       flag === Transaction.ADVANCED_TRANSACTION_FLAG
@@ -62,7 +62,6 @@ class Transaction {
       bufferReader.offset -= 2;
     }
     const vinLen = bufferReader.readVarInt();
-    console.log("offset-1234:", bufferReader.offset)
     for (let i = 0; i < vinLen; ++i) {
       tx.ins.push({
         hash: bufferReader.readSlice(32),
@@ -88,7 +87,6 @@ class Transaction {
         throw new Error('Transaction has superfluous witness data');
       }
     }
-    console.log("offset-short-before:", bufferReader.offset)
     tx.locktime = bufferReader.readUInt32();
     if (_NO_STRICT) {
       return tx;

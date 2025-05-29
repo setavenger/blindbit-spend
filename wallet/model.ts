@@ -150,6 +150,7 @@ export class Wallet {
     let result: CoinSelectResult = coinselect(utxos, targetsRaw, feeRate);
     let { inputs, outputs, fee } = result;
 
+    // keep for now
     console.log(`fee will be ${fee} sats`);
     // todo assert fee
 
@@ -158,7 +159,6 @@ export class Wallet {
     // attach change address to output without address
     outputs.forEach((out: Output) => {
       if (!out.address) {
-        console.log("change address:", this.changeAddress)
         out.address = this.changeAddress;
       };
     });
@@ -190,8 +190,6 @@ export class Wallet {
       });
     });
 
-    console.log("set 2");
-
     targets.forEach(out => {
       if (!out.address) throw new Error("an address was missing");
       if (!out.value) throw new Error("a value was missing");
@@ -201,19 +199,17 @@ export class Wallet {
         value: out.value,
       });
     });
-    console.log("set 3");
 
     // sign inputs
     for (let i = 0; i < inputs.length; i++) {
       let key = ECPair.fromWIF(inputs[i].wif);
       psbt.signInput(i, key);
     }
-    console.log("set 4");
 
     psbt.finalizeAllInputs();
-    console.log("set 5");
 
     const txHex = psbt.extractTransaction(true).toHex();
+    // keep for now
     console.log('Transaction Hex:', txHex);
 
     return psbt;

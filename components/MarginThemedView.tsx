@@ -1,4 +1,5 @@
-import { SafeAreaView, ViewProps, StyleSheet, ScrollView } from 'react-native';
+import { ViewProps, StyleSheet, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { ThemedView } from './ThemedView';

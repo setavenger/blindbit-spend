@@ -963,7 +963,6 @@ const transactionFromBuffer = buffer => new PsbtTransaction(buffer);
  */
 class PsbtTransaction {
   constructor(buffer = Buffer.from([2, 0, 0, 0, 0, 0, 0, 0, 0, 0])) {
-    console.log(buffer);
     this.tx = transaction_1.Transaction.fromBuffer(buffer);
     checkTxEmpty(this.tx);
     Object.defineProperty(this, 'tx', {

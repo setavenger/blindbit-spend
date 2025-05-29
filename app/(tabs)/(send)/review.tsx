@@ -89,7 +89,7 @@ export default function ReviewTransaction() {
         <Button
           title={'Broadcast Tx'}
           onPress={broadcastTx}
-          color={'white'}
+          color={'gray'}
         />
       </ThemedView>
     </MarginThemedView>
